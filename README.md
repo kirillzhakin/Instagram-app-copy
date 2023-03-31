@@ -1,4 +1,4 @@
 # chromium
 
 to-do-list
-1. add checkout develop
+1. add branch develop
