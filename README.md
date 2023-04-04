@@ -6,4 +6,5 @@ to-do-list/commits
 3. add page home and camera
 4. add footer and nav
 5. add footer and header style
+5. add media-breakpoints
 
