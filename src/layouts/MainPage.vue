@@ -2,11 +2,11 @@
   <q-layout view="lHh Lpr lFf">
     <q-header class="bg-white text-grey-10" bordered>
       <q-toolbar>
-        <q-toolbar-title class="text-grand-hotel text-bold"> Chromium </q-toolbar-title>
+        <q-toolbar-title class="text-grand-hotel text-bold"> instagram </q-toolbar-title>
       </q-toolbar>
     </q-header>
 
-    <q-footer class="bg-white" bordered>
+    <q-footer class="bg-white small-screen" bordered>
       <q-tabs
         class="text-grey-10"
         active-color="primary"
@@ -26,7 +26,7 @@
 import { defineComponent, ref } from "vue";
 
 export default defineComponent({
-  name: "MainLayout",
+  name: "MainPage",
 
   components: {},
 
