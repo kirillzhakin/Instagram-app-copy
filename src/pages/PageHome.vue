@@ -1,34 +1,53 @@
 <template>
   <q-page class="desktop-screen q-pa-md">
-    <q-card
-      v-for="post in posts"
-      :key="post.id"
-      class="my-card q-mb-md"
-      flat
-      bordered
-    >
-      <q-item>
-        <q-item-section avatar>
-          <q-avatar>
-            <img src="./../assets/my-avatar.jpg" />
-          </q-avatar>
-        </q-item-section>
+    <div class="row q-col-gutter-lg">
+      <div class="col-8">
+        <q-card
+          v-for="post in posts"
+          :key="post.id"
+          class="my-card q-mb-md"
+          flat
+          bordered
+        >
+          <q-item>
+            <q-item-section avatar>
+              <q-avatar>
+                <img src="./../assets/my-avatar.jpg" />
+              </q-avatar>
+            </q-item-section>
 
-        <q-item-section>
-          <q-item-label class="text-bold">kirill_zhakin</q-item-label>
-          <q-item-label caption> {{ post.location }} </q-item-label>
-        </q-item-section>
-      </q-item>
+            <q-item-section>
+              <q-item-label class="text-bold">kirill_zhakin</q-item-label>
+              <q-item-label caption> {{ post.location }} </q-item-label>
+            </q-item-section>
+          </q-item>
 
-      <q-separator />
+          <q-separator />
 
-      <q-img :src="post.imageUrl" />
+          <q-img :src="post.imageUrl" />
 
-      <q-card-section>
-        <div>{{ post.caption }}</div>
-        <div class="text-caption text-gray">{{ viewDate(post.date) }}</div>
-      </q-card-section>
-    </q-card>
+          <q-card-section>
+            <div>{{ post.caption }}</div>
+            <div class="text-caption text-gray">{{ viewDate(post.date) }}</div>
+          </q-card-section>
+        </q-card>
+      </div>
+      <div class="col-4">
+
+        <q-item class="fixed">
+          <q-item-section avatar>
+            <q-avatar size="48px">
+              <img src="./../assets/my-avatar.jpg" />
+            </q-avatar>
+          </q-item-section>
+
+          <q-item-section>
+            <q-item-label class="text-bold">kirill_zhakin</q-item-label>
+            <q-item-label caption>Kirill Zhakin </q-item-label>
+          </q-item-section>
+        </q-item>
+      </div>
+    </div>
   </q-page>
 </template>
 
