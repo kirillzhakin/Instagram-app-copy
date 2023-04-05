@@ -11,4 +11,5 @@ to-do-list/commits
 8. add info-home-page
 9. add posts
 10. add profile
+11. add camera and form for posts
 
