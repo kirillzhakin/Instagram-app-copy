@@ -1,6 +1,12 @@
 <template>
   <q-page class="desktop-screen q-pa-md">
-    <q-card class="my-card" flat bordered>
+    <q-card
+      v-for="post in posts"
+      :key="post.id"
+      class="my-card q-mb-md"
+      flat
+      bordered
+    >
       <q-item>
         <q-item-section avatar>
           <q-avatar>
@@ -10,31 +16,69 @@
 
         <q-item-section>
           <q-item-label class="text-bold">kirill_zhakin</q-item-label>
-          <q-item-label caption> Moscow, Russia </q-item-label>
+          <q-item-label caption> {{ post.location }} </q-item-label>
         </q-item-section>
       </q-item>
 
       <q-separator />
 
-      <q-img
-        class="rounded-borders"
-        src="../assets/vorobievi-gori-01.jpg"
-      />
+      <q-img :src="post.imageUrl" />
 
       <q-card-section>
-        <div>Sparrow Hills</div>
-        <div class="text-caption text-gray">June 2023</div>
+        <div>{{ post.caption }}</div>
+        <div class="text-caption text-gray">{{ viewDate(post.date) }}</div>
       </q-card-section>
     </q-card>
   </q-page>
 </template>
 
 <script>
-import { defineComponent } from "vue";
+import { date } from "quasar";
+const img =
+  "https://www.mosflot.ru/images/vorobievy-gory/vorobievi-gori-01.jpg";
 
-export default defineComponent({
+export default {
   name: "PageHome",
-});
+  data() {
+    return {
+      posts: [
+        {
+          id: 1,
+          caption: "Sparrow Hills",
+          date: new Date(2022, 6).getTime(),
+          location: "Moscow, Russia",
+          imageUrl: img,
+        },
+        {
+          id: 2,
+          caption: "Sparrow Hills",
+          date: new Date(2022, 7).getTime(),
+          location: "Moscow, Russia",
+          imageUrl: img,
+        },
+        {
+          id: 3,
+          caption: "Sparrow Hills",
+          date: new Date(2022, 8).getTime(),
+          location: "Moscow, Russia",
+          imageUrl: img,
+        },
+        {
+          id: 4,
+          caption: "Sparrow Hills",
+          date: new Date(2022, 9).getTime(),
+          location: "Moscow, Russia",
+          imageUrl: img,
+        },
+      ],
+    };
+  },
+  computed: {
+    viewDate() {
+      return (value) => date.formatDate(value, "DD MMM YYYY");
+    },
+  },
+};
 </script>
 
 <style lang="sass">

@@ -8,4 +8,5 @@ to-do-list/commits
 5. add footer and header style
 6. add media-breakpoints
 7. add nav header
+8. add info-home-page
 
