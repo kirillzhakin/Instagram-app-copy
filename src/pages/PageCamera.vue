@@ -1,11 +1,7 @@
 <template>
   <q-page class="desktop-screen-medium q-pa-md">
     <div class="camera q-pa-md">
-      <video
-        v-show="!imgCaptured"
-        ref="video"
-        class="full-width"
-        autoplay />
+      <video v-show="!imgCaptured" ref="video" class="full-width" autoplay />
       <canvas
         v-show="imgCaptured"
         ref="canvas"
@@ -25,11 +21,11 @@
       <q-file
         v-else
         outlined
-        @update:model-value ="getImageFile"
+        @update:model-value="getImageFile"
         v-model="imgUpload"
         label="Choose an image"
         accept="image/*"
-        >
+      >
         <template v-slot:prepend>
           <q-icon name="eva-attach-outline" />
         </template>
@@ -45,26 +41,26 @@
       <div class="row justify-center q-ma-md">
         <q-input
           class="col col-sm-6"
+          :loading="isLoading"
           v-model="post.location"
           label="Location"
           dense
         >
           <template v-slot:append>
             <q-btn
+              v-if="!isLoading && isSupported"
+              @click="getLocation"
               round
               dense
               flat
-              icon="eva-navigation-2-outline" />
+              icon="eva-navigation-2-outline"
+            />
           </template>
         </q-input>
       </div>
 
       <div class="row justify-center q-mt-lg">
-        <q-btn
-          unelevated
-          rounded
-          color="primary"
-          label="Post Image" />
+        <q-btn unelevated rounded color="primary" label="Post Image" />
       </div>
     </div>
   </q-page>
@@ -72,12 +68,13 @@
 
 <script>
 import { uid } from "quasar";
+import { defineComponent } from "vue";
 
 // require('md-gum-polyfill');
 
 // ... code using getUserMedia...
 
-export default {
+export default defineComponent({
   name: "PageCamera",
   data() {
     return {
@@ -91,8 +88,17 @@ export default {
       imgCaptured: false,
       imgUpload: [],
       hasCamera: true,
+      isLoading: false,
     };
   },
+
+  computed: {
+    isSupported() {
+      if ("geolocation" in navigator) return true;
+      return false;
+    },
+  },
+
   methods: {
     getCamera() {
       navigator.mediaDevices
@@ -100,7 +106,7 @@ export default {
           video: true,
         })
         .then((stream) => (this.$refs.video.srcObject = stream))
-        .catch((error) => (this.hasCamera = false));
+        .catch((err) => (this.hasCamera = false));
     },
     getImage() {
       let video = this.$refs.video;
@@ -112,29 +118,30 @@ export default {
         .drawImage(video, 0, 0, canvas.width, canvas.height);
       this.imgCaptured = true;
       this.post.photo = this.dataURItoBlob(canvas.toDataURL());
+      this.disableCamera();
     },
 
-    getImageFile(file){
-      console.log(file);
-
-      this.post.photo = file
+    getImageFile(file) {
+      this.post.photo = file;
       let canvas = this.$refs.canvas;
 
-      var reader = new FileReader()
-      reader.onload = event => {
-        var img = new Image()
+      var reader = new FileReader();
+      reader.onload = (event) => {
+        var img = new Image();
         img.onload = () => {
           canvas.width = img.width;
           canvas.height = img.height;
-          canvas
-        .getContext("2d")
-        .drawImage(img, 0, 0);
-        this.imgCaptured = true
-        }
-        img.src = event.target.result
-      }
-      reader.readAsDataURL(file)
-
+          canvas.getContext("2d").drawImage(img, 0, 0);
+          this.imgCaptured = true;
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    },
+    disableCamera() {
+      this.$refs.video.srcObject
+        .getVideoTracks()
+        .forEach((track) => track.stop());
     },
 
     dataURItoBlob(dataURI) {
@@ -148,11 +155,43 @@ export default {
       var blob = new Blob([ab], { type: mimeString });
       return blob;
     },
+    getLocation() {
+      this.isLoading = true;
+      navigator.geolocation.getCurrentPosition(
+        (data) => this.getMyPosition(data),
+        (err) => this.locationError(),
+        { timeout: 8000 }
+      );
+    },
+    getMyPosition(data) {
+      const url = `https://geocode.xyz/${data.coords.latitude},${data.coords.longitude}?json=1&auth=118660073096527e15818094x53984`;
+      this.$axios
+        .get(url)
+        .then((res) => this.positionDisplay(res))
+        .catch((err) => this.locationError());
+    },
+    positionDisplay(res) {
+      this.post.location = res.data.city;
+      if (res.data.country) this.post.location += `, ${res.data.country}`;
+      this.isLoading = false;
+    },
+    locationError() {
+      this.$q.dialog({
+        title: "Error",
+        message: "Your location not found",
+      }),
+        (this.isLoading = false);
+    },
   },
   mounted() {
     this.getCamera();
   },
-};
+  beforeUnmount() {
+    if (this.hasCamera) {
+      this.disableCamera();
+    }
+  },
+});
 </script>
 <style lang="sass">
 .camera

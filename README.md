@@ -12,4 +12,6 @@ to-do-list/commits
 9. add posts
 10. add profile
 11. add camera and form for posts
+12. get video and get image capture
+13. get data location
 

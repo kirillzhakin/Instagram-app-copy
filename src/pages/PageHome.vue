@@ -52,11 +52,12 @@
 </template>
 
 <script>
+import { defineComponent } from "vue";
 import { date } from "quasar";
 const img =
   "https://www.mosflot.ru/images/vorobievy-gory/vorobievi-gori-01.jpg";
 
-export default {
+export default  defineComponent({
   name: "PageHome",
   data() {
     return {
@@ -97,7 +98,7 @@ export default {
       return (value) => date.formatDate(value, "DD MMM YYYY");
     },
   },
-};
+});
 </script>
 
 <style lang="sass">
