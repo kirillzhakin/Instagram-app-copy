@@ -44,9 +44,8 @@
 </template>
 
 <script>
-import { defineComponent, ref } from "vue";
 
-export default defineComponent({
+export default {
   name: "MainPage",
 
   components: {},
@@ -56,7 +55,7 @@ export default defineComponent({
 
     return {};
   },
-});
+};
 </script>
 
 <style lang="sass">

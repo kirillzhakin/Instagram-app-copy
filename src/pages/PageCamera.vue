@@ -68,13 +68,12 @@
 
 <script>
 import { uid } from "quasar";
-import { defineComponent } from "vue";
 
 // require('md-gum-polyfill');
 
 // ... code using getUserMedia...
 
-export default defineComponent({
+export default {
   name: "PageCamera",
   data() {
     return {
@@ -191,7 +190,7 @@ export default defineComponent({
       this.disableCamera();
     }
   },
-});
+};
 </script>
 <style lang="sass">
 .camera
