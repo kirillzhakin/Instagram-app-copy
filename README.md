@@ -14,5 +14,5 @@ to-do-list/commits
 11. add camera and form for posts
 12. get video and get image capture
 13. get data location
-14. create back-end express
+14. create backend express
 
