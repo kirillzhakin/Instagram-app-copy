@@ -51,7 +51,7 @@ export default {
   components: {},
 
   setup() {
-    const leftDrawerOpen = ref(false);
+    // const leftDrawerOpen = ref(false);
 
     return {};
   },

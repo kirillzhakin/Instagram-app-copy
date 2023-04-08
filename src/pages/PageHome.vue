@@ -33,7 +33,6 @@
         </q-card>
       </div>
       <div class="col-4 large-screen">
-
         <q-item class="fixed">
           <q-item-section avatar>
             <q-avatar size="48px">
@@ -60,42 +59,25 @@ export default {
   name: "PageHome",
   data() {
     return {
-      posts: [
-        {
-          id: 1,
-          caption: "Sparrow Hills",
-          date: new Date(2022, 6).getTime(),
-          location: "Moscow, Russia",
-          imageUrl: img,
-        },
-        {
-          id: 2,
-          caption: "Sparrow Hills",
-          date: new Date(2022, 7).getTime(),
-          location: "Moscow, Russia",
-          imageUrl: img,
-        },
-        {
-          id: 3,
-          caption: "Sparrow Hills",
-          date: new Date(2022, 8).getTime(),
-          location: "Moscow, Russia",
-          imageUrl: img,
-        },
-        {
-          id: 4,
-          caption: "Sparrow Hills",
-          date: new Date(2022, 9).getTime(),
-          location: "Moscow, Russia",
-          imageUrl: img,
-        },
-      ],
+      posts: [],
     };
+  },
+
+  methods: {
+    getPosts() {
+      this.$axios
+        .get("http://localhost:3000/posts")
+        .then(({ data }) => this.posts = data)
+        .catch((err) => console.log(err));
+    },
   },
   computed: {
     viewDate() {
       return (value) => date.formatDate(value, "DD MMM YYYY");
     },
+  },
+  created() {
+    this.getPosts();
   },
 };
 </script>

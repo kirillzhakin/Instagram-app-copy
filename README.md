@@ -15,4 +15,6 @@ to-do-list/commits
 12. get video and get image capture
 13. get data location
 14. create backend express
+15. relocation folder backend
+16. connect backend and firebase
 
