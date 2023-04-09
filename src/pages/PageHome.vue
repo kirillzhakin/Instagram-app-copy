@@ -2,7 +2,7 @@
   <q-page class="desktop-screen q-pa-md">
     <div class="row q-col-gutter-lg">
       <div class="col-12 col-sm-8">
-        <template v-if="!isLoading">
+        <template v-if="!isLoading && posts.length">
           <q-card
             v-for="post in posts"
             :key="post.id"
@@ -35,6 +35,11 @@
             </q-card-section>
           </q-card>
         </template>
+
+        <template v-else-if="!isLoading && !posts.length">
+          <h5 class="text-center text-grey">No posts</h5>
+        </template>
+
         <template v-else>
           <q-card flat bordered>
             <q-item>
@@ -102,7 +107,7 @@ export default {
     getPosts() {
       this.isLoading = true;
       this.$axios
-        .get("http://localhost:3000/posts")
+        .get(`${ process.env.API }/posts`)
         .then(({ data }) => {
           this.posts = data;
           this.isLoading = false;

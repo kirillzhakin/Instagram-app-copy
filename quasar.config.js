@@ -11,6 +11,8 @@
 
 const { configure } = require('quasar/wrappers');
 
+const API_LOCAL = 'http://localhost:3000'
+const API_PROD = 'https://instagram-app-copy.onrender.com'
 
 module.exports = configure(function (/* ctx */) {
   return {
@@ -55,6 +57,10 @@ module.exports = configure(function (/* ctx */) {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#build
     build: {
+      env: {
+        API: API_LOCAL
+      },
+
       target: {
         browser: [ 'es2019', 'edge88', 'firefox78', 'chrome87', 'safari13.1' ],
         node: 'node16'

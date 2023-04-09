@@ -17,4 +17,6 @@ to-do-list/commits
 14. create backend express
 15. relocation folder backend
 16. connect backend and firebase
+17. loading posts
+18. add process.env
 
