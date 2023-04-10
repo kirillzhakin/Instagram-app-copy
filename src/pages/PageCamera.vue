@@ -60,7 +60,13 @@
       </div>
 
       <div class="row justify-center q-mt-lg">
-        <q-btn unelevated rounded color="primary" label="Post Image" />
+        <q-btn
+          @click="addPost"
+          unelevated
+          rounded
+          color="primary"
+          label="Post Image"
+        />
       </div>
     </div>
   </q-page>
@@ -181,6 +187,19 @@ export default {
       }),
         (this.isLoading = false);
     },
+    addPost() {
+      const postData = new FormData()
+      postData.append('id', this.post.id)
+      postData.append('caption', this.post.caption)
+      postData.append('location', this.post.location)
+      postData.append('date', this.post.date)
+      postData.append('file', this.post.photo, this.post.id + '.png')
+
+      this.$axios.post(`${ process.env.API }/createPost`, postData)
+        .then(res => console.log(res))
+        .catch((err) => console.log(err))
+    },
+
   },
   mounted() {
     this.getCamera();
