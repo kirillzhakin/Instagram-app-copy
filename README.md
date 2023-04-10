@@ -19,4 +19,5 @@ to-do-list/commits
 16. connect backend and firebase
 17. loading posts
 18. add process.env
+19. add post
 

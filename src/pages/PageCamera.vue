@@ -13,6 +13,7 @@
       <q-btn
         v-if="hasCamera"
         @click="getImage"
+        :disable="imgCaptured"
         round
         color="grey-10"
         icon="eva-camera"
@@ -34,7 +35,7 @@
         <q-input
           class="col col-sm-6"
           v-model="post.caption"
-          label="Caption"
+          label="Caption *"
           dense
         />
       </div>
@@ -62,6 +63,7 @@
       <div class="row justify-center q-mt-lg">
         <q-btn
           @click="addPost"
+          :disable="!post.caption || !post.photo"
           unelevated
           rounded
           color="primary"
@@ -188,18 +190,39 @@ export default {
         (this.isLoading = false);
     },
     addPost() {
-      const postData = new FormData()
-      postData.append('id', this.post.id)
-      postData.append('caption', this.post.caption)
-      postData.append('location', this.post.location)
-      postData.append('date', this.post.date)
-      postData.append('file', this.post.photo, this.post.id + '.png')
+      this.$q.loading.show();
+      const postData = new FormData();
+      postData.append("id", this.post.id);
+      postData.append("caption", this.post.caption);
+      postData.append("location", this.post.location);
+      postData.append("date", this.post.date);
+      postData.append("file", this.post.photo, this.post.id + ".png");
 
-      this.$axios.post(`${ process.env.API }/createPost`, postData)
-        .then(res => console.log(res))
-        .catch((err) => console.log(err))
+      this.$axios
+        .post(`${process.env.API}/createPost`, postData)
+        .then((res) => {
+          console.log(res);
+          this.$router.push("/");
+          this.$q.notify({
+            message: "Post created!",
+            actions: [
+              {
+                label: "Dismiss",
+                color: "white",
+              },
+            ],
+          });
+          this.$q.loading.hide();
+        })
+        .catch((err) => {
+          console.log(err);
+          this.$q.dialog({
+            title: "Error",
+            message: "Sory, could not create post",
+          });
+          this.$q.loading.hide();
+        });
     },
-
   },
   mounted() {
     this.getCamera();
