@@ -1,35 +1,42 @@
 {
-  "name": "client-app-instagram",
-  "version": "0.0.1",
-  "description": "A Quasar Project",
-  "productName": "Quasar App",
-  "author": "kirillzhakin",
-  "private": true,
-  "scripts": {
-    "lint": "eslint --ext .js,.vue ./",
-    "format": "prettier --write \"**/*.{js,vue,html,md,json}\" --ignore-path .gitignore",
-    "test": "echo \"No test specified\" && exit 0"
-  },
-  "dependencies": {
-    "@quasar/extras": "^1.0.0",
-    "axios": "^1.2.1",
-    "quasar": "^2.6.0",
-    "vue": "^3.0.0",
-    "vue-router": "^4.0.0"
-  },
-  "devDependencies": {
-    "md-gum-polyfill": "^1.0.0",
-    "@quasar/app-vite": "^1.0.0",
-    "autoprefixer": "^10.4.2",
-    "eslint": "^8.10.0",
-    "eslint-config-prettier": "^8.1.0",
-    "eslint-plugin-vue": "^9.0.0",
-    "postcss": "^8.4.14",
-    "prettier": "^2.5.1"
-  },
-  "engines": {
-    "node": "^18 || ^16 || ^14.19",
-    "npm": ">= 6.13.4",
-    "yarn": ">= 1.21.1"
-  }
+	"name": "client-app-instagram",
+	"version": "0.0.1",
+	"description": "instagram-copy-app",
+	"productName": "instagram-copy-app",
+	"author": "kirillzhakin",
+	"private": true,
+	"scripts": {
+		"lint": "eslint --ext .js,.vue ./",
+		"format": "prettier --write \"**/*.{js,vue,html,md,json}\" --ignore-path .gitignore",
+		"test": "echo \"No test specified\" && exit 0"
+	},
+	"dependencies": {
+		"@quasar/extras": "^1.0.0",
+		"axios": "^1.2.1",
+		"quasar": "^2.6.0",
+		"vue": "^3.0.0",
+		"vue-router": "^4.0.0"
+	},
+	"devDependencies": {
+		"@quasar/app-vite": "^1.0.0",
+		"autoprefixer": "^10.4.2",
+		"eslint": "^8.10.0",
+		"eslint-config-prettier": "^8.1.0",
+		"eslint-plugin-vue": "^9.0.0",
+		"md-gum-polyfill": "^1.0.0",
+		"postcss": "^8.4.14",
+		"prettier": "^2.8.7",
+		"workbox-build": "^6.5.4",
+		"workbox-cacheable-response": "^6.5.4",
+		"workbox-core": "^6.5.4",
+		"workbox-expiration": "^6.5.4",
+		"workbox-precaching": "^6.5.4",
+		"workbox-routing": "^6.5.4",
+		"workbox-strategies": "^6.5.4"
+	},
+	"engines": {
+		"node": "^18 || ^16 || ^14.19",
+		"npm": ">= 6.13.4",
+		"yarn": ">= 1.21.1"
+	}
 }

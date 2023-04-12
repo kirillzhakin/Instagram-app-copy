@@ -20,4 +20,5 @@ to-do-list/commits
 17. loading posts
 18. add process.env
 19. add post
+20. add spinner display
 

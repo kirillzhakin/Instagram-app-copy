@@ -1,9 +1,11 @@
 <template>
-	<router-view />
+	<div>ABC</div>
 </template>
-
 <script>
 export default {
-	name: 'App'
+	name: 'AuthPage',
+	data() {
+		return {}
+	}
 }
 </script>
