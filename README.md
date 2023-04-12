@@ -1,6 +1,7 @@
 # chromium
 
 to-do-list/commits
+
 1. add branch develop
 2. create project
 3. add page home and camera
@@ -21,4 +22,5 @@ to-do-list/commits
 18. add process.env
 19. add post
 20. add spinner display
-
+21. create pwa and init manifest
+22. get icons from pwa

@@ -50,7 +50,8 @@ export default {
 </script>
 
 <style lang="sass">
-.q-icon
+.eva-home-outline,
+.eva-camera-outline
   margin-top: 5px
 .q-toolbar
   @media (min-width: $breakpoint-sm-min)
