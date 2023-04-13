@@ -2,16 +2,16 @@
 .text-grand-hotel
   font-family: 'Grand Hotel', 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif
 
-.small-screen
+.small-screen-only
   @media (max-width: $breakpoint-xs-max)
     display: block
   @media (min-width: $breakpoint-sm-min)
     display: none
-.large-screen
+.large-screen-only
   @media (max-width: $breakpoint-xs-max)
     display: none
   @media (min-width: $breakpoint-sm-min)
-    display: block
+    display: flex
 
 .desktop-screen
   max-width: 975px

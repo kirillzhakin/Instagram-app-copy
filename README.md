@@ -24,3 +24,4 @@ to-do-list/commits
 20. add spinner display
 21. create pwa and init manifest
 22. get icons from pwa
+23. add banner install app

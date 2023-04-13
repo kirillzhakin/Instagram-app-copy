@@ -4,20 +4,20 @@
 			<q-toolbar class="desktop-screen">
 				<q-btn
 					to="/camera"
-					class="large-screen q-mr-sm"
+					class="large-screen-only q-mr-sm"
 					flat
 					round
 					dense
 					size="18px"
 					icon="eva-camera-outline"
 				/>
-				<q-separator class="large-screen" spaced vertical />
+				<q-separator class="large-screen-only" spaced vertical />
 				<q-toolbar-title class="text-grand-hotel text-bold">
 					Instagram
 				</q-toolbar-title>
 				<q-btn
 					to="/"
-					class="large-screen"
+					class="large-screen-only"
 					flat
 					round
 					dense
@@ -27,9 +27,54 @@
 			</q-toolbar>
 		</q-header>
 
-		<q-footer class="bg-white small-screen" bordered>
+		<q-footer class="bg-white" bordered>
+			<transition
+				appear
+				enter-active-class="animated fadeIn"
+				leave-active-class="animated fadeOut"
+			>
+				<div v-if="showInstallApp" class="banner-container bg-primary">
+					<div class="constrain">
+						<q-banner inline-actions dense class="bg-primary text-white">
+							<template v-slot:avatar>
+								<q-avatar
+									color="white"
+									icon="eva-camera-outline"
+									text-color="grey-10"
+									font-size="22px"
+								/>
+							</template>
+							Install App?
+							<template v-slot:action>
+								<q-btn
+									@click="installApp"
+									flat
+									label="Yes"
+									dense
+									class="q-px-sm"
+								/>
+								<q-btn
+									@click="showInstallApp = false"
+									flat
+									label="Later"
+									dense
+									class="q-px-sm"
+								/>
+								<q-btn
+									@click="neverShowAppInstall"
+									flat
+									label="Never"
+									dense
+									class="q-px-sm"
+								/>
+							</template>
+						</q-banner>
+					</div>
+				</div>
+			</transition>
+
 			<q-tabs
-				class="text-grey-10"
+				class="text-grey-10 small-screen-only"
 				active-color="primary"
 				indicator-color="transparent"
 			>
@@ -44,15 +89,56 @@
 </template>
 
 <script>
+let deferredPrompt
 export default {
-	name: 'MainPage'
+	name: 'MainPage',
+
+	data() {
+		return {
+			showInstallApp: false
+		}
+	},
+
+	methods: {
+		installApp() {
+			this.showInstallApp = false
+			deferredPrompt.prompt()
+			deferredPrompt.userChoice.then(result => {
+				if (result.outcome === 'accepted') {
+					console.log('User accepted the install prompt')
+				} else {
+					console.log('User dismissed the install prompt')
+				}
+			})
+		},
+
+		neverShowAppInstall() {
+			this.showInstallApp = false
+			this.$q.localStorage.set('neverShowAppInstall', true)
+		}
+	},
+	mounted() {
+		const dontShowAppInstall = this.$q.localStorage.getItem(
+			'neverShowAppInstall'
+		)
+
+		if (!dontShowAppInstall) {
+			window.addEventListener('dblclick', e => {
+				// beforeinstallprompt ---????????
+				e.preventDefault()
+				deferredPrompt = e
+
+				setTimeout(() => {
+					this.showInstallApp = true
+				}, 3000)
+			})
+		}
+	}
 }
 </script>
 
 <style lang="sass">
-.eva-home-outline,
-.eva-camera-outline
-  margin-top: 5px
+
 .q-toolbar
   @media (min-width: $breakpoint-sm-min)
     height: 77px
