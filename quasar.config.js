@@ -60,14 +60,14 @@ module.exports = configure(function (/* ctx */) {
 				node: 'node16'
 			},
 
-			vueRouterMode: 'history', // available values: 'hash', 'history'
+			vueRouterMode: 'history' // available values: 'hash', 'history'
 			// vueRouterBase,
 			// vueDevtools,
 			// vueOptionsAPI: false,
 
 			// rebuildCache: true, // rebuilds Vite/linter/etc cache on startup
 
-			publicPath: '/'
+			// publicPath: '/'
 			// analyze: true,
 			// env: {},
 			// rawDefine: {}
@@ -147,7 +147,7 @@ module.exports = configure(function (/* ctx */) {
 
 		// https://v2.quasar.dev/quasar-cli/developing-pwa/configuring-pwa
 		pwa: {
-			workboxMode: 'generateSW', // or 'injectManifest'
+			workboxMode: 'injectManifest', // or 'injectManifest'
 			injectPwaMetaTags: true,
 			swFilename: 'sw.js',
 			manifestFilename: 'manifest.json',
@@ -192,7 +192,7 @@ module.exports = configure(function (/* ctx */) {
 			builder: {
 				// https://www.electron.build/configuration/configuration
 
-				appId: 'chromium'
+				appId: 'instagram-copy-app'
 			}
 		},
 

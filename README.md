@@ -25,3 +25,4 @@ to-do-list/commits
 21. create pwa and init manifest
 22. get icons from pwa
 23. add banner install app
+24. debug pwa

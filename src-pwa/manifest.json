@@ -1,8 +1,8 @@
 {
 	"name": "Instagram-copy-app",
-	"short_name": "Instagram-copy-app",
-	"description": "Instagram-copy-app",
-	"display": "stadalone",
+	"short_name": "app-project",
+	"description": "App project",
+	"display": "standalone",
 	"orientation": "portrait",
 	"background_color": "#ffffff",
 	"theme_color": "#212121",

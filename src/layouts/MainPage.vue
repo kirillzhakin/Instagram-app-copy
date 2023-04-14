@@ -123,8 +123,7 @@ export default {
 		)
 
 		if (!dontShowAppInstall) {
-			window.addEventListener('dblclick', e => {
-				// beforeinstallprompt ---????????
+			window.addEventListener('beforeinstallprompt', e => {
 				e.preventDefault()
 				deferredPrompt = e
 
