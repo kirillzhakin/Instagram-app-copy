@@ -27,3 +27,4 @@ to-do-list/commits
 23. add banner install app
 24. debug pwa
 25. config firebase hosting
+26. add workbox strategies
