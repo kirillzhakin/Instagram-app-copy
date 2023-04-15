@@ -26,3 +26,4 @@ to-do-list/commits
 22. get icons from pwa
 23. add banner install app
 24. debug pwa
+25. config firebase hosting
