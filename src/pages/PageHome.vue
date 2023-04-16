@@ -91,6 +91,7 @@
 
 <script>
 import { date } from 'quasar'
+import { openDB } from 'idb'
 
 export default {
 	name: 'PageHome',
@@ -109,6 +110,9 @@ export default {
 				.then(({ data }) => {
 					this.posts = data
 					this.isLoading = false
+					if (!navigator.onLine) {
+						this.getOfflinePosts()
+					}
 				})
 				.catch(err => {
 					this.$q.dialog({
@@ -117,6 +121,26 @@ export default {
 					})
 					this.isLoading = false
 				})
+		},
+		getOfflinePosts() {
+			const db = openDB('workbox-background-sync').then(db => {
+				db.getAll('requests')
+					.then(badRequests => {
+						{
+							badRequests.forEach(req => {
+								if (req.queueName === 'createPost') {
+									const request = new Request(
+										req.requestData.url,
+										req.requestData
+									)
+								}
+							})
+						}
+					})
+					.catch(err => {
+						console.log('Error IndexDB:', err)
+					})
+			})
 		}
 	},
 	computed: {

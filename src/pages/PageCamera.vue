@@ -103,6 +103,10 @@ export default {
 		isSupported() {
 			if ('geolocation' in navigator) return true
 			return false
+		},
+		isSyncSupported() {
+			if ('serviceWorker' in navigator && 'SyncManager' in window) return true
+			return false
 		}
 	},
 
@@ -214,10 +218,15 @@ export default {
 				})
 				.catch(err => {
 					console.log(err)
-					this.$q.dialog({
-						title: 'Error',
-						message: 'Sory, could not create post'
-					})
+					if (!navigator.onLine && this.isSyncSupported) {
+						this.$q.notify('Post created offline')
+						this.$router.push('/')
+					} else {
+						this.$q.dialog({
+							title: 'Error',
+							message: 'Sory, could not create post'
+						})
+					}
 					this.$q.loading.hide()
 				})
 		}
