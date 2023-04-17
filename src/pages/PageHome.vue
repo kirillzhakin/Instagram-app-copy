@@ -7,9 +7,16 @@
 						v-for="post in posts"
 						:key="post.id"
 						class="my-card q-mb-md"
+						:class="{ 'bg-red-1': post.offline }"
 						flat
 						bordered
 					>
+						<q-badge
+							v-if="post.offline"
+							class="badge-offline absolute-top-right"
+							color="red"
+							>Offline post</q-badge
+						>
 						<q-item>
 							<q-item-section avatar>
 								<q-avatar>
@@ -133,6 +140,21 @@ export default {
 										req.requestData.url,
 										req.requestData
 									)
+									request.formData().then(formData => {
+										let offlinePost = {}
+										offlinePost.id = formData.get('id')
+										offlinePost.caption = formData.get('caption')
+										offlinePost.location = formData.get('location')
+										offlinePost.date = parseInt(formData.get('date'))
+										offlinePost.offline = true
+
+										let reader = new FileReader()
+										reader.readAsDataURL(formData.get('file'))
+										reader.onloadend = () => {
+											offlinePost.imageUrl = reader.result
+											this.posts.unshift(offlinePost)
+										}
+									})
 								}
 							})
 						}
@@ -141,21 +163,46 @@ export default {
 						console.log('Error IndexDB:', err)
 					})
 			})
+		},
+		listenForOfflinePostUploaded() {
+			console.log('listenOfflinePost')
+			if (this.isSupported) {
+				const channel = new BroadcastChannel('sw-message')
+				channel.addEventListener('message', event => {
+					console.log('Recived', event.data)
+					if (event.data.message === 'offline-post-uploaded') {
+						const offlinePostsLength = this.posts.filter(
+							post => post.offline === true
+						).length
+						this.posts[offlinePostsLength - 1].offline = false
+					}
+				})
+			}
 		}
 	},
 	computed: {
 		viewDate() {
 			return value => date.formatDate(value, 'DD MMM YYYY')
+		},
+		isSupported() {
+			if ('serviceWorker' in navigator) return true
+			return false
 		}
+	},
+	activated() {
+		console.log('getPosts')
 	},
 	created() {
 		this.getPosts()
+		this.listenForOfflinePostUploaded()
 	}
 }
 </script>
 
 <style lang="sass">
-.card-post
+.my-card
+  .badge-offline
+    border-top-left-radius: 0 !important
   .q-img
     min-height: 200px
 </style>

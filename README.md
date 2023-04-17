@@ -29,3 +29,4 @@ to-do-list/commits
 25. config firebase hosting
 26. add workbox strategies
 27. backgroud sync
+28. offline posts

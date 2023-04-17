@@ -24,7 +24,26 @@ console.log('backgroundSyncSupported>>>', backgroundSyncSupported)
 let createPost = null
 
 if (backgroundSyncSupported) {
-	createPost = new Queue('createPost')
+	createPost = new Queue('createPost', {
+		onSync: async ({ queue }) => {
+			let entry
+			while ((entry = await queue.shiftRequest())) {
+				try {
+					await fetch(entry.request)
+					console.log('Replay successful for request', entry.request)
+					const channel = new BroadcastChannel('sw-message')
+					channel.postMessage({ message: 'offline-post-uploaded' })
+				} catch (error) {
+					console.error('Replay failed for request', entry.request, error)
+
+					// Put the entry back in the queue and re-throw the error:
+					await queue.unshiftRequest(entry)
+					throw error
+				}
+			}
+			console.log('Replay complete!')
+		}
+	})
 }
 
 // Caching strategies
@@ -55,7 +74,6 @@ registerRoute(
 
 // Events - fetch
 if (backgroundSyncSupported) {
-	console.log('1>>>')
 	self.addEventListener('fetch', event => {
 		if (event.request.url.endsWith('/createPost')) {
 			// Клонируем запрос для безопасного чтения
