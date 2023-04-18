@@ -1,5 +1,51 @@
 <template>
 	<q-page class="desktop-screen q-pa-md">
+		<transition
+			appear
+			enter-active-class="animated fadeIn"
+			leave-active-class="animated fadeOut"
+		>
+			<div
+				v-if="showNotifications && isNotificationsSupported"
+				class="banner-container bg-primary"
+			>
+				<div class="constrain">
+					<q-banner inline-actions class="bg-grey-3 q-mb-md">
+						<template v-slot:avatar>
+							<q-icon name="eva-bell-outline" color="primary" />
+						</template>
+						Enable notifications?
+						<template v-slot:action>
+							<q-btn
+								@click="getNotifications"
+								color="primary"
+								flat
+								label="Yes"
+								dense
+								class="q-px-sm"
+							/>
+							<q-btn
+								@click="showNotifications = false"
+								color="primary"
+								flat
+								label="Later"
+								dense
+								class="q-px-sm"
+							/>
+							<q-btn
+								@click="neverShowNotifications"
+								color="primary"
+								flat
+								label="Never"
+								dense
+								class="q-px-sm"
+							/>
+						</template>
+					</q-banner>
+				</div>
+			</div>
+		</transition>
+
 		<div class="row q-col-gutter-lg">
 			<div class="col-12 col-sm-8">
 				<template v-if="!isLoading && posts.length">
@@ -99,13 +145,15 @@
 <script>
 import { date } from 'quasar'
 import { openDB } from 'idb'
+import qs from 'qs'
 
 export default {
 	name: 'PageHome',
 	data() {
 		return {
 			posts: [],
-			isLoading: false
+			isLoading: false,
+			showNotifications: false
 		}
 	},
 
@@ -121,7 +169,7 @@ export default {
 						this.getOfflinePosts()
 					}
 				})
-				.catch(err => {
+				.catch(_err => {
 					this.$q.dialog({
 						title: 'Error',
 						message: 'Posts not found'
@@ -165,7 +213,6 @@ export default {
 			})
 		},
 		listenForOfflinePostUploaded() {
-			console.log('listenOfflinePost')
 			if (this.isSupported) {
 				const channel = new BroadcastChannel('sw-message')
 				channel.addEventListener('message', event => {
@@ -178,6 +225,106 @@ export default {
 					}
 				})
 			}
+		},
+		initNotifications() {
+			const dontShowNotifications = this.$q.localStorage.getItem(
+				'neverShowNotifications'
+			)
+
+			if (!dontShowNotifications) {
+				this.showNotifications = true
+			}
+		},
+		getNotifications() {
+			if (this.isNotificationsSupported) {
+				Notification.requestPermission(res => {
+					console.log(res)
+					this.neverShowNotifications()
+					if (res === 'granted') {
+						// this.viewGrantedNotifications()
+						this.checkPushSubscribtion()
+					}
+				})
+			}
+		},
+		checkPushSubscribtion() {
+			if (this.isSupported && this.isNotificationsSupported) {
+				let registration
+				navigator.serviceWorker.ready
+					.then(sw => {
+						registration = sw
+						return sw.pushManager.getSubscription()
+					})
+					.then(sub => {
+						if (!sub) {
+							this.createPushSubscription(registration)
+						}
+					})
+			}
+		},
+		createPushSubscription(registration) {
+			const vapidPublicKey =
+				'BG01MtyPGvDl5NFWAFhhBigyG0VOb6x78I1KwiC0q2b30xd4MFpJQzhYxq5fSSGkfosq74iM-kcLkj36xoEHzpE'
+			registration.pushManager
+				.subscribe({
+					userVisibleOnly: true,
+					applicationServerKey: vapidPublicKey
+				})
+				.then(sub => {
+					const subData = sub.toJSON()
+					const subDataQS = qs.stringify(subData)
+					return this.$axios.post(
+						`${process.env.API}/createSubscription?${subDataQS}`
+					)
+				})
+				.then(res => {
+					console.log(res)
+					this.viewGrantedNotifications()
+				})
+				.catch(err => console.log(err))
+		},
+		viewGrantedNotifications() {
+			// new Notification("You're subscribed to notifications", {
+			// 	body: 'Thanks for subscribing',
+			// 	icon: '/icons/favicon-128x128.png',
+			// 	badge: '/icons/favicon-128x128.png',
+			// 	dir: 'ltr',
+			// 	lang: 'en-US',
+			// 	vibrate: [100, 50, 200],
+			// 	tag: 'confirm-notifications',
+			// 	renotify: true
+			// })
+
+			if (this.isSupported && this.isNotificationsSupported) {
+				navigator.serviceWorker.ready.then(sw =>
+					sw.showNotification("You're subscribed to notifications", {
+						body: 'Thanks for subscribing',
+						icon: '/icons/favicon-128x128.png',
+						badge: '/icons/favicon-128x128.png',
+						dir: 'ltr',
+						lang: 'en-US',
+						vibrate: [100, 50, 200],
+						tag: 'confirm-notifications',
+						renotify: true,
+						actions: [
+							{
+								action: 'hello',
+								title: 'Hello',
+								icon: '/icons/favicon-128x128.png'
+							},
+							{
+								action: 'goodbye',
+								title: 'Goodbye',
+								icon: '/icons/favicon-128x128.png'
+							}
+						]
+					})
+				)
+			}
+		},
+		neverShowNotifications() {
+			this.showNotifications = false
+			this.$q.localStorage.set('neverShowNotifications', true)
 		}
 	},
 	computed: {
@@ -187,14 +334,18 @@ export default {
 		isSupported() {
 			if ('serviceWorker' in navigator) return true
 			return false
+		},
+		isNotificationsSupported() {
+			if ('PushManager' in window) return true
+			return false
 		}
 	},
 	activated() {
-		console.log('getPosts')
+		this.getPosts()
 	},
 	created() {
-		this.getPosts()
 		this.listenForOfflinePostUploaded()
+		this.initNotifications()
 	}
 }
 </script>

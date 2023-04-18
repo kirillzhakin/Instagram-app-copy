@@ -30,3 +30,4 @@ to-do-list/commits
 26. add workbox strategies
 27. backgroud sync
 28. offline posts
+29. add push notifications

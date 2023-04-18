@@ -77,7 +77,7 @@
 <script>
 import { uid } from 'quasar'
 
-// require('md-gum-polyfill');
+// require('md-gum-polyfill')
 
 // ... code using getUserMedia...
 

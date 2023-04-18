@@ -20,7 +20,6 @@ precacheAndRoute(self.__WB_MANIFEST)
 
 // Queue - createPost
 const backgroundSyncSupported = 'sync' in self.registration ? true : false
-console.log('backgroundSyncSupported>>>', backgroundSyncSupported)
 let createPost = null
 
 if (backgroundSyncSupported) {
@@ -86,3 +85,18 @@ if (backgroundSyncSupported) {
 		}
 	})
 }
+
+self.addEventListener('notificationclick', ({ action, notification }) => {
+	if (action === 'hello') {
+		console.log(action)
+	} else if (action === 'goodbye') {
+		console.log(action)
+	} else {
+		console.log('Close notification')
+	}
+	notification.close()
+})
+
+self.addEventListener('notificationclick', event => {
+	console.log('On notification click: ', event)
+})
