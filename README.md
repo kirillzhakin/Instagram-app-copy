@@ -31,3 +31,4 @@ to-do-list/commits
 27. backgroud sync
 28. offline posts
 29. add push notifications
+30. add push notifications last version

@@ -77,24 +77,54 @@ if (backgroundSyncSupported) {
 		if (event.request.url.endsWith('/createPost')) {
 			// Клонируем запрос для безопасного чтения
 			// при добавлении в очередь
-			const promiseChain = fetch(event.request.clone()).catch(err => {
-				return createPost.pushRequest({ request: event.request })
-			})
-
-			event.waitUntil(promiseChain)
+			if (!self.navigator.onLine) {
+				const promiseChain = fetch(event.request.clone()).catch(_err => {
+					return createPost.pushRequest({ request: event.request })
+				})
+				event.waitUntil(promiseChain)
+			}
 		}
 	})
 }
 
-self.addEventListener('notificationclick', ({ action, notification }) => {
-	if (action === 'hello') {
-		console.log(action)
-	} else if (action === 'goodbye') {
-		console.log(action)
-	} else {
-		console.log('Close notification')
+self.addEventListener('push', event => {
+	console.log('PUSH', event.data)
+	if (event.data) {
+		const data = JSON.parse(event.data.text())
+		event.waitUntil(
+			self.registration.showNotification(data.title, {
+				body: data.body,
+				icon: '/icons/favicon-128x128.png',
+				badge: '/icons/favicon-128x128.png',
+				data: {
+					openUrl: data.openUrl
+				}
+			})
+		)
 	}
-	notification.close()
+})
+
+self.addEventListener('notificationclick', event => {
+	if (event.action === 'hello') {
+		console.log(event.action)
+	} else if (event.action === 'goodbye') {
+		console.log(event.action)
+	} else {
+		event.waitUntil(
+			clients.matchAll().then(clis => {
+				const clientUsingApp = clis.find(
+					cli => cli.visibilityState === 'visible'
+				)
+				if (clientUsingApp) {
+					clientUsingApp.navigate(event.notification.data.openUrl)
+					clientUsingApp.focus()
+				} else {
+					clients.openWindow(event.notification.data.openUrl)
+				}
+			})
+		)
+	}
+	event.notification.close()
 })
 
 self.addEventListener('notificationclick', event => {

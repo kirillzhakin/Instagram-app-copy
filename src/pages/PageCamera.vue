@@ -168,7 +168,7 @@ export default {
 			this.isLoading = true
 			navigator.geolocation.getCurrentPosition(
 				data => this.getMyPosition(data),
-				err => this.locationError(),
+				_err => this.locationError(),
 				{ timeout: 8000 }
 			)
 		},
@@ -177,7 +177,7 @@ export default {
 			this.$axios
 				.get(url)
 				.then(res => this.positionDisplay(res))
-				.catch(err => this.locationError())
+				.catch(_err => this.locationError())
 		},
 		positionDisplay(res) {
 			this.post.location = res.data.city
