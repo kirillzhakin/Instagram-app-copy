@@ -33,3 +33,4 @@ to-do-list/commits
 29. add push notifications
 30. add push notifications last version
 31. fixed keep-alive
+32. fixed location

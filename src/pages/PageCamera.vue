@@ -50,7 +50,7 @@
 					<template v-slot:append>
 						<q-btn
 							v-if="!isLoading && isSupported"
-							@click="getLocation"
+							@click="getMyPosition"
 							round
 							dense
 							flat
@@ -117,7 +117,7 @@ export default {
 					video: true
 				})
 				.then(stream => (this.$refs.video.srcObject = stream))
-				.catch(err => (this.hasCamera = false))
+				.catch(_err => (this.hasCamera = false))
 		},
 		getImage() {
 			let video = this.$refs.video
@@ -164,32 +164,30 @@ export default {
 			var blob = new Blob([ab], { type: mimeString })
 			return blob
 		},
-		getLocation() {
+
+		getMyPosition() {
 			this.isLoading = true
-			navigator.geolocation.getCurrentPosition(
-				data => this.getMyPosition(data),
-				_err => this.locationError(),
-				{ timeout: 8000 }
-			)
-		},
-		getMyPosition(data) {
-			const url = `https://geocode.xyz/${data.coords.latitude},${data.coords.longitude}?json=1&auth=118660073096527e15818094x53984`
+			const url =
+				'http://api.ipstack.com/176.215.128.94?access_key=2dbb4287b639aae8b0dd1e17a88c63e1'
 			this.$axios
 				.get(url)
-				.then(res => this.positionDisplay(res))
+				.then(res => {
+					this.positionDisplay(res)
+				})
 				.catch(_err => this.locationError())
 		},
 		positionDisplay(res) {
 			this.post.location = res.data.city
-			if (res.data.country) this.post.location += `, ${res.data.country}`
+			if (res.data.country_name)
+				this.post.location += `, ${res.data.country_name}`
 			this.isLoading = false
 		},
 		locationError() {
 			this.$q.dialog({
 				title: 'Error',
 				message: 'Your location not found'
-			}),
-				(this.isLoading = false)
+			})
+			this.isLoading = false
 		},
 		addPost() {
 			this.$q.loading.show()
