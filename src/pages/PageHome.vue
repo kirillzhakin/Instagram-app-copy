@@ -341,9 +341,11 @@ export default {
 		}
 	},
 	activated() {
+		console.log('ACTIVATED() >>>>>>>>>>>>>>>>>>>>')
 		this.getPosts()
 	},
 	created() {
+		console.log('CREATED() >>>>>>>>>>>>>>>>>>>>')
 		this.listenForOfflinePostUploaded()
 		this.initNotifications()
 	}

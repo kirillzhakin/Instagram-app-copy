@@ -32,3 +32,4 @@ to-do-list/commits
 28. offline posts
 29. add push notifications
 30. add push notifications last version
+31. fixed keep-alive

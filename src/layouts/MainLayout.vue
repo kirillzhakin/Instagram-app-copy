@@ -83,9 +83,11 @@
 			</q-tabs>
 		</q-footer>
 		<q-page-container class="bg-grey-1">
-			<keep-alive :include="PageHome">
-				<router-view />
-			</keep-alive>
+			<router-view v-slot="{ Component }">
+				<keep-alive :include="['PageHome']">
+					<component :is="Component" />
+				</keep-alive>
+			</router-view>
 		</q-page-container>
 	</q-layout>
 </template>
@@ -93,7 +95,7 @@
 <script>
 let deferredPrompt
 export default {
-	name: 'MainPage',
+	name: 'MainLayout',
 
 	data() {
 		return {
