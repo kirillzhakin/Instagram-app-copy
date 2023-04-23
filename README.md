@@ -34,3 +34,6 @@ to-do-list/commits
 30. add push notifications last version
 31. fixed keep-alive
 32. fixed location
+33. add utils constants
+
+Hosting URL: https://chromium-d89a6.web.app

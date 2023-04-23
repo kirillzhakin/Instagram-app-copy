@@ -76,6 +76,7 @@
 
 <script>
 import { uid } from 'quasar'
+import { urlApi } from '../utils/constants.js'
 
 // require('md-gum-polyfill')
 
@@ -167,8 +168,7 @@ export default {
 
 		getMyPosition() {
 			this.isLoading = true
-			const url =
-				'http://api.ipstack.com/176.215.128.94?access_key=2dbb4287b639aae8b0dd1e17a88c63e1'
+			const url = urlApi
 			this.$axios
 				.get(url)
 				.then(res => {

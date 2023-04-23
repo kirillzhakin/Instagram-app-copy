@@ -146,6 +146,7 @@
 import { date } from 'quasar'
 import { openDB } from 'idb'
 import qs from 'qs'
+import { vapidPublicKey } from '../utils/constants.js'
 
 export default {
 	name: 'PageHome',
@@ -263,12 +264,11 @@ export default {
 			}
 		},
 		createPushSubscription(registration) {
-			const vapidPublicKey =
-				'BG01MtyPGvDl5NFWAFhhBigyG0VOb6x78I1KwiC0q2b30xd4MFpJQzhYxq5fSSGkfosq74iM-kcLkj36xoEHzpE'
+			const publicKey = vapidPublicKey
 			registration.pushManager
 				.subscribe({
 					userVisibleOnly: true,
-					applicationServerKey: vapidPublicKey
+					applicationServerKey: publicKey
 				})
 				.then(sub => {
 					const subData = sub.toJSON()
@@ -341,11 +341,9 @@ export default {
 		}
 	},
 	activated() {
-		console.log('ACTIVATED() >>>>>>>>>>>>>>>>>>>>')
 		this.getPosts()
 	},
 	created() {
-		console.log('CREATED() >>>>>>>>>>>>>>>>>>>>')
 		this.listenForOfflinePostUploaded()
 		this.initNotifications()
 	}

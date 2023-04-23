@@ -88,9 +88,10 @@ if (backgroundSyncSupported) {
 }
 
 self.addEventListener('push', event => {
-	console.log('PUSH', event.data)
 	if (event.data) {
 		const data = JSON.parse(event.data.text())
+		console.log(data)
+
 		event.waitUntil(
 			self.registration.showNotification(data.title, {
 				body: data.body,
@@ -105,6 +106,8 @@ self.addEventListener('push', event => {
 })
 
 self.addEventListener('notificationclick', event => {
+	console.log(event.notification)
+	console.log(event.notification.data)
 	if (event.action === 'hello') {
 		console.log(event.action)
 	} else if (event.action === 'goodbye') {
