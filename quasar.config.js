@@ -11,7 +11,7 @@
 const { configure } = require('quasar/wrappers')
 
 const API_LOCAL = 'http://localhost:3000'
-const API_PROD = 'https://instagram-app-copy.onrender.com'
+const API_PROD = 'https://instagram-copy.onrender.com'
 
 module.exports = configure(function (/* ctx */) {
 	return {
@@ -60,10 +60,11 @@ module.exports = configure(function (/* ctx */) {
 				node: 'node16'
 			},
 
-			vueRouterMode: 'history' // available values: 'hash', 'history'
+			vueRouterMode: 'hash', // available values: 'hash', 'history'
 			// vueRouterBase,
 			// vueDevtools,
 			// vueOptionsAPI: false,
+			transpileDependencies: ['idb']
 
 			// rebuildCache: true, // rebuilds Vite/linter/etc cache on startup
 

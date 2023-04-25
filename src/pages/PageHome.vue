@@ -161,8 +161,14 @@ export default {
 	methods: {
 		getPosts() {
 			this.isLoading = true
+
+			let timestamp = ''
+			if (thid.$q.platform.is.ie) {
+				timestamp = '?timestamp=' + Date.now()
+			}
+
 			this.$axios
-				.get(`${process.env.API}/posts`)
+				.get(`${process.env.API}/posts${timestamp}`)
 				.then(({ data }) => {
 					this.posts = data
 					this.isLoading = false

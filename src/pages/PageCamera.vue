@@ -183,9 +183,14 @@ export default {
 			this.isLoading = false
 		},
 		locationError() {
+			const locationErrorMessage = 'Your location not found'
+			if (this.$q.platform.is.mac) {
+				locationErrorMessage +=
+					' You might be able to fix this in System Preferences > Security & Privacy > Location Services'
+			}
 			this.$q.dialog({
 				title: 'Error',
-				message: 'Your location not found'
+				message: locationErrorMessage
 			})
 			this.isLoading = false
 		},
@@ -201,7 +206,6 @@ export default {
 			this.$axios
 				.post(`${process.env.API}/createPost`, postData)
 				.then(res => {
-					console.log(res)
 					this.$router.push('/')
 					this.$q.notify({
 						message: 'Post created!',
@@ -213,6 +217,11 @@ export default {
 						]
 					})
 					this.$q.loading.hide()
+					if (this.$q.platform.is.safari) {
+						setTimeout(() => {
+							window.location.href = '/'
+						}, 1000)
+					}
 				})
 				.catch(err => {
 					console.log(err)
