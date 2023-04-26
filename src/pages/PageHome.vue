@@ -71,7 +71,7 @@
 							</q-item-section>
 
 							<q-item-section>
-								<q-item-label class="text-bold">kirill_zhakin</q-item-label>
+								<q-item-label class="text-bold">kirill_ivanov</q-item-label>
 								<q-item-label caption> {{ post.location }} </q-item-label>
 							</q-item-section>
 						</q-item>
@@ -133,8 +133,8 @@
 					</q-item-section>
 
 					<q-item-section>
-						<q-item-label class="text-bold">kirill_zhakin</q-item-label>
-						<q-item-label caption>Kirill Zhakin </q-item-label>
+						<q-item-label class="text-bold">kirill_ivanov</q-item-label>
+						<q-item-label caption>Kirill Ivanov </q-item-label>
 					</q-item-section>
 				</q-item>
 			</div>
@@ -163,7 +163,7 @@ export default {
 			this.isLoading = true
 
 			let timestamp = ''
-			if (thid.$q.platform.is.ie) {
+			if (this.$q.platform.is.ie) {
 				timestamp = '?timestamp=' + Date.now()
 			}
 

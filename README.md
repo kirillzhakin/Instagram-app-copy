@@ -35,5 +35,6 @@ to-do-list/commits
 31. fixed keep-alive
 32. fixed location
 33. add utils constants
+34. fixing desktop issues
 
 Hosting URL: https://chromium-d89a6.web.app

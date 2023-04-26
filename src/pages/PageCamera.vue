@@ -50,7 +50,7 @@
 					<template v-slot:append>
 						<q-btn
 							v-if="!isLoading && isSupported"
-							@click="getMyPosition"
+							@click="getLocation"
 							round
 							dense
 							flat
@@ -166,20 +166,35 @@ export default {
 			return blob
 		},
 
-		getMyPosition() {
+		getLocation() {
+			console.log('getLocation')
 			this.isLoading = true
-			const url = urlApi
+			navigator.geolocation.getCurrentPosition(
+				position => {
+					this.getMyPosition(position)
+				},
+				_err => {
+					this.locationError()
+				},
+				{ timeout: 7000 }
+			)
+		},
+
+		getMyPosition(position) {
+			console.log('getMyPosition')
+			const url = `https://geocode.maps.co/reverse?lat=${position.coords.latitude}&lon=${position.coords.longitude}`
 			this.$axios
 				.get(url)
 				.then(res => {
+					console.log('Data', res)
 					this.positionDisplay(res)
 				})
 				.catch(_err => this.locationError())
 		},
 		positionDisplay(res) {
-			this.post.location = res.data.city
-			if (res.data.country_name)
-				this.post.location += `, ${res.data.country_name}`
+			this.post.location = res.data.address.city
+			if (res.data.address.country)
+				this.post.location += `, ${res.data.address.country}`
 			this.isLoading = false
 		},
 		locationError() {

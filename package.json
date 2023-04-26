@@ -3,7 +3,7 @@
 	"version": "0.0.1",
 	"description": "instagram-copy-app",
 	"productName": "instagram-copy-app",
-	"author": "kirillzhakin",
+	"author": "kirillivanov",
 	"private": true,
 	"scripts": {
 		"deploy": "quasar build -m pwa && firebase deploy",
