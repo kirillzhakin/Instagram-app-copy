@@ -1,6 +1,6 @@
 {
 	"name": "Instagram-copy-app",
-	"short_name": "app-project",
+	"short_name": "instagram-copy-app",
 	"description": "App project",
 	"display": "standalone",
 	"orientation": "portrait",

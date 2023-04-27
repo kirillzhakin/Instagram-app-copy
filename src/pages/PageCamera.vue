@@ -76,7 +76,6 @@
 
 <script>
 import { uid } from 'quasar'
-import { urlApi } from '../utils/constants.js'
 
 // require('md-gum-polyfill')
 
@@ -182,6 +181,7 @@ export default {
 
 		getMyPosition(position) {
 			console.log('getMyPosition')
+			console.log(position)
 			const url = `https://geocode.maps.co/reverse?lat=${position.coords.latitude}&lon=${position.coords.longitude}`
 			this.$axios
 				.get(url)
@@ -211,46 +211,58 @@ export default {
 		},
 		addPost() {
 			this.$q.loading.show()
-			const postData = new FormData()
-			postData.append('id', this.post.id)
-			postData.append('caption', this.post.caption)
-			postData.append('location', this.post.location)
-			postData.append('date', this.post.date)
-			postData.append('file', this.post.photo, this.post.id + '.png')
 
-			this.$axios
-				.post(`${process.env.API}/createPost`, postData)
-				.then(res => {
-					this.$router.push('/')
-					this.$q.notify({
-						message: 'Post created!',
-						actions: [
-							{
-								label: 'Dismiss',
-								color: 'white'
-							}
-						]
-					})
-					this.$q.loading.hide()
-					if (this.$q.platform.is.safari) {
-						setTimeout(() => {
-							window.location.href = '/'
-						}, 1000)
-					}
-				})
-				.catch(err => {
-					console.log(err)
-					if (!navigator.onLine && this.isSyncSupported) {
-						this.$q.notify('Post created offline')
+			const postCreated = this.$q.localStorage.getItem('postCreated')
+
+			if (this.$q.platform.is.android && !postCreated && !navigator.onLine) {
+				this.addPostError()
+				this.$q.loading.hide()
+			} else {
+				const postData = new FormData()
+				postData.append('id', this.post.id)
+				postData.append('caption', this.post.caption)
+				postData.append('location', this.post.location)
+				postData.append('date', this.post.date)
+				postData.append('file', this.post.photo, this.post.id + '.png')
+
+				this.$axios
+					.post(`${process.env.API}/createPost`, postData)
+					.then(_res => {
+						this.$q.localStorage.set('postCreated', true)
 						this.$router.push('/')
-					} else {
-						this.$q.dialog({
-							title: 'Error',
-							message: 'Sory, could not create post'
+						this.$q.notify({
+							message: 'Post created!',
+							actions: [
+								{
+									label: 'Dismiss',
+									color: 'white'
+								}
+							]
 						})
-					}
-					this.$q.loading.hide()
-				})
+						this.$q.loading.hide()
+						if (this.$q.platform.is.safari) {
+							setTimeout(() => {
+								window.location.href = '/'
+							}, 1000)
+						}
+					})
+					.catch(err => {
+						console.log(err)
+						if (!navigator.onLine && this.isSyncSupported && postCreated) {
+							this.$q.notify('Post created offline')
+							this.$router.push('/')
+						} else {
+							this.addPostError()
+						}
+						this.$q.loading.hide()
+					})
+			}
+		},
+		addPostError() {
+			this.$q.dialog({
+				title: 'Error',
+				message: 'Sory, could not create post'
+			})
 		}
 	},
 	mounted() {
