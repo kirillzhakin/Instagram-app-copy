@@ -38,5 +38,6 @@ to-do-list/commits
 34. fixing desktop issues
 35. fixing geocodung
 36. fixing create posts android
+37. fixing image button ios
 
 Hosting URL: https://chromium-d89a6.web.app
