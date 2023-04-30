@@ -1,7 +1,14 @@
 const routes = [
 	{
 		path: '/auth',
-		component: () => import('pages/AuthPage.vue')
+		component: () => import('pages/AuthPage.vue'),
+		children: [
+			{ path: '', component: () => import('pages/auth/LoginSection.vue') },
+			{
+				path: 'register',
+				component: () => import('pages/auth/RegisterSection.vue')
+			}
+		]
 	},
 
 	{

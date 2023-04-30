@@ -40,4 +40,6 @@ to-do-list/commits
 36. fixing create posts android
 37. fixing image button ios
 
+38. add register form
+
 Hosting URL: https://chromium-d89a6.web.app

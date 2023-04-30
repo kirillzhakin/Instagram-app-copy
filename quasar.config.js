@@ -52,7 +52,7 @@ module.exports = configure(function (/* ctx */) {
 		// Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#build
 		build: {
 			env: {
-				API: API_PROD /// API_LOCAL or API _PROD
+				API: API_LOCAL /// API_LOCAL or API _PROD
 			},
 
 			target: {
