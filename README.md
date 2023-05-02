@@ -42,5 +42,6 @@ to-do-list/commits
 
 38. add register form
 39. fixing register form
+40. add auth form
 
 Hosting URL: https://chromium-d89a6.web.app

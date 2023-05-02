@@ -1,13 +1,7 @@
 <template>
 	<q-layout view="lHh Lpr lFf">
-		<q-header class="bg-white text-grey-10" bordered>
-			<q-toolbar class="desktop-screen">
-				<q-toolbar-title class="toolbar-title__auth text-grand-hotel text-bold">
-					Instagram
-				</q-toolbar-title>
-			</q-toolbar>
-		</q-header>
-		<q-page-container class="bg-grey-1">
+		<q-page-container>
+			<h1 class="page-title text-grand-hotel text-bold">Instagram</h1>
 			<router-view v-slot="{ Component }">
 				<transition appear enter-active-class="animated bounceInLeft">
 					<component :is="Component" />
@@ -25,7 +19,37 @@ export default defineComponent({
 </script>
 
 <style lang="sass">
-.toolbar-title__auth
+
+.page-title
+  margin: 150px auto 0 auto
   text-align: center
-  font-size: 30px
+  font-size: 40px
+
+.q-field
+  margin-bottom: 5px
+
+.q-page
+  margin: 0 auto
+  max-width: 500px
+
+.q-btn
+  width: 100%
+  height: 50px
+  text-transform: none
+
+.option
+  display: flex
+  margin: 15px auto 0 auto
+  width: 100%
+  height: 20px
+  justify-content: center
+
+.option__text
+  align-items: center
+  text-align: end
+
+.option__btn
+  color: $primary
+  text-align: start
+  text-decoration: none
 </style>

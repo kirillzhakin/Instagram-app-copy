@@ -1,10 +1,7 @@
 <template>
 	<div id="registrationPage">
-		<q-page class="q-pa-md">
-			<q-toolbar class="toolbar-style">
-				<q-toolbar-title>Sign Up to share your photos!</q-toolbar-title>
-			</q-toolbar>
-			<q-form @submit="onSubmit" class="form-style">
+		<q-page class="q-pa-md page">
+			<q-form @submit="onSubmit">
 				<q-input
 					filled
 					v-model="name"
@@ -23,40 +20,24 @@
 				/>
 
 				<div>
-					<q-btn label="Sign up" type="submit" color="primary" />
+					<q-btn
+						class="form-btn"
+						label="Sign up"
+						type="submit"
+						color="primary"
+					/>
 				</div>
 			</q-form>
+			<div class="option">
+				<!-- <p class="option__text">Have an account?</p> -->
+				<!-- <q-btn unelevated class="option__btn" to="/auth" label="Log in" /> -->
+				<p class="option__text">
+					Have an account? <a class="option__btn" href="/#/auth">Log in</a>
+				</p>
+			</div>
 		</q-page>
 	</div>
 </template>
 <script setup></script>
 
-<style lang="scss">
-#registrationPage {
-	.q-field {
-		margin-bottom: 5px;
-	}
-	.q-btn {
-		width: 100%;
-		text-transform: none;
-	}
-	.toolbar-style {
-		text-align: center;
-		margin: 0 auto;
-		max-width: 500px;
-	}
-	.form-style {
-		margin: 0 auto;
-		height: calc(100vh - 180px);
-		max-width: 500px;
-	}
-
-	@media (min-width: $breakpoint-sm-max) {
-		.form-style {
-			margin: 0 auto;
-			height: calc(100vh - 100px);
-			max-width: 500px;
-		}
-	}
-}
-</style>
+<style lang="sass"></style>
