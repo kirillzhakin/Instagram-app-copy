@@ -16,7 +16,11 @@ const routes = [
 		component: () => import('layouts/MainLayout.vue'),
 		children: [
 			{ path: '/', component: () => import('pages/PageHome.vue') },
-			{ path: '/camera', component: () => import('pages/PageCamera.vue') }
+			{ path: '/camera', component: () => import('pages/PageCamera.vue') },
+			{
+				path: '/account',
+				component: () => import('pages/AccountPage.vue')
+			}
 		]
 	},
 

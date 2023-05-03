@@ -4,8 +4,8 @@
 			<q-form @submit="onSubmit">
 				<q-input
 					filled
-					v-model="name"
-					label="Your name"
+					v-model="login"
+					label="Your login"
 					lazy-rules
 					:rules="[val => (val && val.length > 0) || 'Please type something']"
 				/>
@@ -29,16 +29,11 @@
 				</div>
 			</q-form>
 			<div class="option">
-				<!-- <p class="option__text">Don't have an account?</p>
-				<q-btn
-					unelevated
-					class="option__btn"
-					to="/auth/register"
-					label="Sign up"
-				/> -->
 				<p class="option__text">
 					Don't have an account?
-					<a class="option__btn" href="/#/auth/register">Sign up</a>
+					<router-link class="option__btn" to="/auth/register"
+						>Sign up</router-link
+					>
 				</p>
 			</div>
 		</q-page>

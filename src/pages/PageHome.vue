@@ -63,7 +63,7 @@
 							color="red"
 							>Offline post</q-badge
 						>
-						<q-item>
+						<q-item @click="getMyAccount">
 							<q-item-section avatar>
 								<q-avatar>
 									<img src="./../assets/my-avatar.jpg" />
@@ -124,20 +124,22 @@
 					</q-card>
 				</template>
 			</div>
-			<div class="col-4 large-screen">
-				<q-item class="fixed">
-					<q-item-section avatar>
-						<q-avatar size="48px">
-							<img src="./../assets/my-avatar.jpg" />
-						</q-avatar>
-					</q-item-section>
+			<router-link class="link-account" to="account">
+				<div class="col-4 large-screen">
+					<q-item class="fixed">
+						<q-item-section avatar>
+							<q-avatar size="48px">
+								<img src="./../assets/my-avatar.jpg" />
+							</q-avatar>
+						</q-item-section>
 
-					<q-item-section>
-						<q-item-label class="text-bold">kirill_ivanov</q-item-label>
-						<q-item-label caption>Kirill Ivanov </q-item-label>
-					</q-item-section>
-				</q-item>
-			</div>
+						<q-item-section>
+							<q-item-label class="text-bold">login</q-item-label>
+							<q-item-label caption>name</q-item-label>
+						</q-item-section>
+					</q-item>
+				</div>
+			</router-link>
 		</div>
 	</q-page>
 </template>
@@ -362,4 +364,7 @@ export default {
     border-top-left-radius: 0 !important
   .q-img
     min-height: 200px
+
+.link-account
+  color: $dark
 </style>
