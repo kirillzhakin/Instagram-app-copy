@@ -44,5 +44,6 @@ to-do-list/commits
 39. fixing register form
 40. add auth form
 41. add account menu
+42. add register firebase
 
 Hosting URL: https://chromium-d89a6.web.app
