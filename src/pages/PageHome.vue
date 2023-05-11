@@ -66,7 +66,7 @@
 						<q-item @click="getMyAccount">
 							<q-item-section avatar>
 								<q-avatar>
-									<img src="./../assets/my-avatar.jpg" />
+									<img src="./../assets/user.svg" />
 								</q-avatar>
 							</q-item-section>
 
@@ -129,7 +129,7 @@
 					<q-item class="fixed">
 						<q-item-section avatar>
 							<q-avatar size="48px">
-								<img src="./../assets/my-avatar.jpg" />
+								<img src="./../assets/user.svg" />
 							</q-avatar>
 						</q-item-section>
 

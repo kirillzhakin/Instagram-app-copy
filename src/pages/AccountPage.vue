@@ -4,7 +4,7 @@
 			<q-item-section>
 				<q-btn round color="primary" class="avatar-btn">
 					<q-avatar size="150px">
-						<img src="./../assets/my-avatar.jpg" />
+						<img src="./../assets/user.svg" />
 					</q-avatar>
 				</q-btn>
 			</q-item-section>

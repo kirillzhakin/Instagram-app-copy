@@ -1,6 +1,6 @@
 <template>
 	<div id="authPage">
-		<q-layout view="lHh Lpr lFf">
+		<q-layout style="min-height: 0" view="lHh Lpr lFf">
 			<q-page-container>
 				<h1 class="page-title text-grand-hotel text-bold">Instagram</h1>
 				<router-view v-slot="{ Component }">
@@ -31,6 +31,7 @@ export default defineComponent({
   .q-page
     margin: 0 auto
     max-width: 500px
+
 
   .q-btn
     width: 100%
