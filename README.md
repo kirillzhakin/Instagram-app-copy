@@ -47,5 +47,5 @@ to-do-list/commits
 42. add register firebase
 43. add env file
 44. add login firebase
-
-Hosting URL: https://chromium-d89a6.web.app
+45. add update firebase
+    Hosting URL: https://chromium-d89a6.web.app

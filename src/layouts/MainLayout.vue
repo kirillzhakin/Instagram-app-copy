@@ -34,7 +34,7 @@
 				leave-active-class="animated fadeOut"
 			>
 				<div v-if="showInstallApp" class="banner-container bg-primary">
-					<div class="constrain">
+					<div class="desktop-screen">
 						<q-banner inline-actions dense class="bg-primary text-white">
 							<template v-slot:avatar>
 								<q-avatar

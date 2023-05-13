@@ -9,7 +9,7 @@
 				v-if="showNotifications && isNotificationsSupported"
 				class="banner-container bg-primary"
 			>
-				<div class="constrain">
+				<div class="desktop-screen">
 					<q-banner inline-actions class="bg-grey-3 q-mb-md">
 						<template v-slot:avatar>
 							<q-icon name="eva-bell-outline" color="primary" />
@@ -63,15 +63,17 @@
 							color="red"
 							>Offline post</q-badge
 						>
-						<q-item @click="getMyAccount">
-							<q-item-section avatar>
-								<q-avatar>
-									<img src="./../assets/user.svg" />
-								</q-avatar>
-							</q-item-section>
+						<q-item>
+							<router-link class="link-account" to="account">
+								<q-item-section avatar>
+									<q-avatar>
+										<img :src="avatar" />
+									</q-avatar>
+								</q-item-section>
+							</router-link>
 
 							<q-item-section>
-								<q-item-label class="text-bold">kirill_ivanov</q-item-label>
+								<q-item-label class="text-bold">{{ email }}</q-item-label>
 								<q-item-label caption> {{ post.location }} </q-item-label>
 							</q-item-section>
 						</q-item>
@@ -125,17 +127,17 @@
 				</template>
 			</div>
 			<router-link class="link-account" to="account">
-				<div class="col-4 large-screen">
+				<div class="col-4">
 					<q-item class="fixed">
 						<q-item-section avatar>
 							<q-avatar size="48px">
-								<img src="./../assets/user.svg" />
+								<img :src="avatar" />
 							</q-avatar>
 						</q-item-section>
 
 						<q-item-section>
-							<q-item-label class="text-bold">login</q-item-label>
-							<q-item-label caption>name</q-item-label>
+							<q-item-label class="text-bold">{{ email }}</q-item-label>
+							<q-item-label caption>{{ name }}</q-item-label>
 						</q-item-section>
 					</q-item>
 				</div>
@@ -149,15 +151,50 @@ import { date } from 'quasar'
 import { openDB } from 'idb'
 import qs from 'qs'
 import { vapidPublicKey } from '../utils/constants.js'
+import { auth } from '../services/firebase-service'
+import { onAuthStateChanged } from 'firebase/auth'
+
+import image from './../assets/user.svg'
 
 export default {
 	name: 'PageHome',
 	data() {
 		return {
+			email: '',
+			name: '',
+			avatar: image,
 			posts: [],
 			isLoading: false,
 			showNotifications: false
 		}
+	},
+	mounted() {
+		onAuthStateChanged(auth, user => {
+			if (user) {
+				console.log('currentUser:', user.displayName)
+				const { email, displayName, photoURL, uid } = user
+				console.log(user)
+				this.$q.localStorage.set('userData', {
+					email,
+					displayName,
+					photoURL,
+					uid
+				})
+			} else {
+				this.$router.push('/auth')
+			}
+			const userData = this.$q.localStorage.getItem('userData')
+			this.email = userData.email
+			this.name = userData.displayName
+			this.avatar = userData.photoURL
+		})
+	},
+
+	beforeUpdate() {
+		const userData = this.$q.localStorage.getItem('userData')
+		this.email = userData.email
+		this.name = userData.displayName
+		this.avatar = userData.photoURL
 	},
 
 	methods: {
@@ -367,4 +404,5 @@ export default {
 
 .link-account
   color: $dark
+  text-decoration: none
 </style>

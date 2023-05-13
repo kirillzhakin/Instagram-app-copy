@@ -180,13 +180,10 @@ export default {
 		},
 
 		getMyPosition(position) {
-			console.log('getMyPosition')
-			console.log(position)
 			const url = `https://geocode.maps.co/reverse?lat=${position.coords.latitude}&lon=${position.coords.longitude}`
 			this.$axios
 				.get(url)
 				.then(res => {
-					console.log('Data', res)
 					this.positionDisplay(res)
 				})
 				.catch(_err => this.locationError())

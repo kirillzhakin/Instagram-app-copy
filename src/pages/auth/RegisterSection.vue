@@ -153,6 +153,7 @@ const registerUser = async () => {
 		})
 
 		const currentUser = auth.currentUser
+		console.log(currentUser)
 		if (currentUser !== null) {
 			console.log(`User ${user.displayName} account created!`)
 			router.push('/')
