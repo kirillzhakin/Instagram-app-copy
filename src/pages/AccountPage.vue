@@ -2,22 +2,21 @@
 	<div id="accountMenu">
 		<q-page class="q-pa-md">
 			<q-item-section>
-				<q-btn round color="primary" class="avatar-btn">
+				<q-btn
+					ref="buttonRef"
+					round
+					color="primary"
+					class="avatar-btn"
+					@click.prevent="getFile"
+				>
 					<q-avatar size="150px">
-						<img src="./../assets/user.svg" />
+						<img :src="avatar" />
 					</q-avatar>
 				</q-btn>
+				<q-input ref="fileRef" style="display: none" type="file"></q-input>
 			</q-item-section>
 
 			<q-form @submit.prevent="updateUser">
-				<q-input
-					filled
-					v-model="email"
-					label="Your email"
-					stack-label
-					:error-message="errors.email.errorMsg"
-					:error="errors.email.errorType"
-				/>
 				<q-input
 					filled
 					v-model="name"
@@ -26,10 +25,44 @@
 					:error-message="errors.name.errorMsg"
 					:error="errors.name.errorType"
 				/>
+				<q-input
+					filled
+					v-model="email"
+					label="Your email"
+					stack-label
+					:error-message="errors.email.errorMsg"
+					:error="errors.email.errorType"
+				/>
+				<!-- <q-input
+					filled
+					v-model="password"
+					label="Password"
+					type="password"
+					stack-label
+					:error-message="errors.password.errorMsg"
+					:error="errors.password.errorType"
+				/> -->
 
+				<q-input
+					filled
+					v-model="password"
+					label="Password"
+					:type="isPwd ? 'password' : 'text'"
+					stack-label
+					:error-message="errors.password.errorMsg"
+					:error="errors.password.errorType"
+				>
+					<template v-slot:append>
+						<q-icon
+							:name="isPwd ? 'visibility_off' : 'visibility'"
+							class="cursor-pointer"
+							@click="isPwd = !isPwd"
+						/>
+					</template>
+				</q-input>
 				<div>
 					<q-btn
-						:disable="!email || !name"
+						:disable="!email || !name || !password"
 						class="form__btn"
 						label="Update data"
 						type="submit"
@@ -40,7 +73,7 @@
 
 			<div class="option">
 				<p>You can</p>
-				<button class="option__btn">Log out</button>
+				<button class="option__btn" @click="logout">Log out</button>
 				<p>of your account</p>
 			</div>
 		</q-page>
@@ -50,32 +83,42 @@
 <script setup>
 import { auth } from '../services/firebase-service'
 import { ref, reactive, onMounted } from 'vue'
-import { onAuthStateChanged, updateProfile } from 'firebase/auth'
+import {
+	onAuthStateChanged,
+	updateProfile,
+	updateEmail,
+	updatePassword,
+	signOut
+} from 'firebase/auth'
 import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { emailPattern } from '../utils/constants'
+import imageUser from '../assets/user.svg'
 
 const router = useRouter()
 const $q = useQuasar()
-
-const email = ref('')
 const name = ref('')
+const email = ref('')
+const avatar = ref(imageUser)
 const password = ref('')
+const isPwd = ref(true)
 
 const errors = reactive({
+	name: { errorMsg: null, errorType: null },
 	email: { errorMsg: null, errorType: null },
-	name: { errorMsg: null, errorType: null }
+	password: { errorMsg: null, errorType: null }
 })
 
 onMounted(() => {
-	const user = $q.localStorage.getItem('userData')
-	console.log('currentUser:', user)
-	if (user) {
-		email.value = user.email || ''
-		name.value = user.displayName || ''
-	} else {
-		router.push('./auth')
-	}
+	onAuthStateChanged(auth, user => {
+		if (user) {
+			name.value = user.displayName
+			email.value = user.email
+			avatar.value = user.photoURL ? user.photoURL : imageUser
+		} else {
+			router.push('./auth')
+		}
+	})
 })
 
 const isValidEmail = val => {
@@ -84,6 +127,16 @@ const isValidEmail = val => {
 
 const validation = () => {
 	let isError = false
+	// Name
+	if (name.value.length < 1) {
+		errors.name.errorMsg = 'Please enter your name'
+		errors.name.errorType = true
+		isError = true
+	} else {
+		errors.name.errorMsg = null
+		errors.name.errorType = null
+	}
+	// Name END
 
 	// Email
 	if (email.value.length < 1) {
@@ -100,17 +153,20 @@ const validation = () => {
 	}
 	// Email END
 
-	// Name
-	if (name.value.length < 1) {
-		errors.name.errorMsg = 'Please enter your name'
-		errors.name.errorType = true
+	// Password
+	if (password.value.length < 1) {
+		errors.password.errorMsg = 'Please enter your password'
+		errors.password.errorType = true
+		isError = true
+	} else if (password.value.length > 0 && password.value.length < 6) {
+		errors.password.errorMsg = 'The minimum password length is 6 characters'
+		errors.password.errorType = true
 		isError = true
 	} else {
-		errors.name.errorMsg = null
-		errors.name.errorType = null
+		errors.password.errorMsg = null
+		errors.password.errorType = null
 	}
-	// Name END
-
+	// Password END
 	return isError
 }
 
@@ -120,30 +176,23 @@ const userError = (message = 'Upps...', title = 'Error') => {
 		title
 	})
 }
+
+const getFile = () => {
+	console.log(5)
+	console.log(fileRef.value)
+}
+
 const userUpdateData = async user => {
 	await updateProfile(user, {
-		displayName: name.value,
-		photoURL:
-			'https://img.freepik.com/premium-photo/confident-handsome-redhead-man-with-arms-crossed-body-smiling-looking-determined-like-professional-standing-casual-clothes-against-white-background_176420-53768.jpg?w=1380'
+		photoURL: null,
+		displayName: name.value
 	})
-
-	if (user !== null) {
-		const { email, displayName, photoURL, uid } = user
-		$q.localStorage.set('userData', { email, displayName, photoURL, uid })
-		console.log(`User ${user.displayName} account updated!`)
-		router.push('/')
-		$q.notify({
-			type: 'positive',
-			color: 'primary',
-			message: `User ${user.displayName} account updated!`
-		})
-	}
-	$q.loading.hide()
-	if ($q.platform.is.safari) {
-		setTimeout(() => {
-			window.location.href = '/'
-		}, 1000)
-	}
+}
+const userUpdateEmail = async user => {
+	await updateEmail(user, email.value)
+}
+const userUpdatePassword = async user => {
+	await updatePassword(user, password.value)
 }
 const updateUser = async () => {
 	const isError = validation()
@@ -156,22 +205,72 @@ const updateUser = async () => {
 			'Your update was unsuccessful. Please make sure you are connection to the internet.'
 		const title = 'Offline'
 		userError(message, title)
+
 		$q.loading.hide()
 	}
-
+	const currentUser = auth.currentUser
+	const promises = []
+	if (email.value) {
+		promises.push(userUpdateEmail(currentUser))
+	}
+	if (name.value) {
+		promises.push(userUpdateData(currentUser))
+	}
+	if (password.value) {
+		promises.push(userUpdatePassword(currentUser))
+	}
 	try {
-		await userUpdateData(auth.currentUser)
+		await Promise.all(promises)
+		router.push('/')
+		$q.loading.hide()
+		$q.notify({
+			type: 'positive',
+			color: 'primary',
+			message: `Your profile has been changed!`
+		})
+		if ($q.platform.is.safari) {
+			setTimeout(() => {
+				window.location.href = '/auth'
+			}, 1000)
+		}
 	} catch (err) {
+		if (err.code === 'auth/requires-recent-login') {
+			userError('Please re-login to the app!')
+		}
 		if (err.code === 'auth/email-already-in-use') {
 			userError('That email address is already in use!')
 		}
-
 		if (err.code === 'auth/invalid-email') {
 			userError('That email address is invalid!')
 		} else if (err.code === 'auth/weak-password') {
 			userError('Password should be at least 6 characters!')
 		} else if (err) userError(err.message)
 		$q.loading.hide()
+		console.error(err)
+	}
+}
+
+const logout = () => {
+	$q.loading.show()
+	try {
+		signOut(auth)
+		$q.loading.hide()
+		router.push('/auth')
+		$q.notify({
+			type: 'positive',
+			color: 'primary',
+			message: `You are logged out!`
+		})
+
+		$q.loading.hide()
+		if ($q.platform.is.safari) {
+			setTimeout(() => {
+				window.location.href = '/auth'
+			}, 1000)
+		}
+	} catch (err) {
+		$q.loading.hide()
+		if (err) userError()
 		console.error(err)
 	}
 }

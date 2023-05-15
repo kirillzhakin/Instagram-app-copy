@@ -48,4 +48,5 @@ to-do-list/commits
 43. add env file
 44. add login firebase
 45. add update firebase
+46. fixing update firebase
     Hosting URL: https://chromium-d89a6.web.app

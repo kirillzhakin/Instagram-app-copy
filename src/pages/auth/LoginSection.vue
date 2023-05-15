@@ -15,11 +15,19 @@
 					filled
 					v-model="password"
 					label="Password"
-					type="password"
+					:type="isPwd ? 'password' : 'text'"
 					stack-label
 					:error-message="errors.password.errorMsg"
 					:error="errors.password.errorType"
-				/>
+				>
+					<template v-slot:append>
+						<q-icon
+							:name="isPwd ? 'visibility_off' : 'visibility'"
+							class="cursor-pointer"
+							@click="isPwd = !isPwd"
+						/>
+					</template>
+				</q-input>
 
 				<div>
 					<q-btn
@@ -56,6 +64,7 @@ const $q = useQuasar()
 
 const email = ref('')
 const password = ref('')
+const isPwd = ref(true)
 
 const errors = reactive({
 	email: { errorMsg: null, errorType: null },

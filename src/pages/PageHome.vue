@@ -73,7 +73,7 @@
 							</router-link>
 
 							<q-item-section>
-								<q-item-label class="text-bold">{{ email }}</q-item-label>
+								<q-item-label class="text-bold">{{ name }}</q-item-label>
 								<q-item-label caption> {{ post.location }} </q-item-label>
 							</q-item-section>
 						</q-item>
@@ -136,8 +136,8 @@
 						</q-item-section>
 
 						<q-item-section>
-							<q-item-label class="text-bold">{{ email }}</q-item-label>
-							<q-item-label caption>{{ name }}</q-item-label>
+							<q-item-label class="text-bold">{{ name }}</q-item-label>
+							<q-item-label caption>{{ email }}</q-item-label>
 						</q-item-section>
 					</q-item>
 				</div>
@@ -153,8 +153,7 @@ import qs from 'qs'
 import { vapidPublicKey } from '../utils/constants.js'
 import { auth } from '../services/firebase-service'
 import { onAuthStateChanged } from 'firebase/auth'
-
-import image from './../assets/user.svg'
+import imageUser from '../assets/user.svg'
 
 export default {
 	name: 'PageHome',
@@ -162,42 +161,44 @@ export default {
 		return {
 			email: '',
 			name: '',
-			avatar: image,
+			avatar: '',
 			posts: [],
 			isLoading: false,
 			showNotifications: false
 		}
 	},
 	mounted() {
-		onAuthStateChanged(auth, user => {
-			if (user) {
-				console.log('currentUser:', user.displayName)
-				const { email, displayName, photoURL, uid } = user
-				console.log(user)
-				this.$q.localStorage.set('userData', {
-					email,
-					displayName,
-					photoURL,
-					uid
-				})
-			} else {
-				this.$router.push('/auth')
-			}
-			const userData = this.$q.localStorage.getItem('userData')
-			this.email = userData.email
-			this.name = userData.displayName
-			this.avatar = userData.photoURL
-		})
+		console.log(1)
+		this.authUserChange()
 	},
 
 	beforeUpdate() {
-		const userData = this.$q.localStorage.getItem('userData')
-		this.email = userData.email
-		this.name = userData.displayName
-		this.avatar = userData.photoURL
+		console.log(2)
+		this.authUserChange()
 	},
 
 	methods: {
+		authUserChange() {
+			onAuthStateChanged(auth, user => {
+				if (user) {
+					console.log('currentUser:', user.displayName)
+					const { email, displayName, photoURL, uid } = user
+					console.log(user)
+					this.$q.localStorage.set('userData', {
+						email,
+						displayName,
+						photoURL,
+						uid
+					})
+				} else {
+					this.$router.push('/auth')
+				}
+				const userData = this.$q.localStorage.getItem('userData')
+				this.email = userData.email
+				this.name = userData.displayName
+				this.avatar = userData.photoURL ? userData.photoURL : imageUser
+			})
+		},
 		getPosts() {
 			this.isLoading = true
 

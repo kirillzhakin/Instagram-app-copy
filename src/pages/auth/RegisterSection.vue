@@ -4,30 +4,38 @@
 			<q-form @submit.prevent="registerUser">
 				<q-input
 					filled
-					v-model="email"
-					label="Your email"
-					stack-label
-					:error-message="errors.email.errorMsg"
-					:error="errors.email.errorType"
-				/>
-				<q-input
-					filled
 					v-model="name"
 					label="Your name"
 					stack-label
 					:error-message="errors.name.errorMsg"
 					:error="errors.name.errorType"
 				/>
+				<q-input
+					filled
+					v-model="email"
+					label="Your email"
+					stack-label
+					:error-message="errors.email.errorMsg"
+					:error="errors.email.errorType"
+				/>
 
 				<q-input
 					filled
 					v-model="password"
 					label="Password"
-					type="password"
+					:type="isPwd ? 'password' : 'text'"
 					stack-label
 					:error-message="errors.password.errorMsg"
 					:error="errors.password.errorType"
-				/>
+				>
+					<template v-slot:append>
+						<q-icon
+							:name="isPwd ? 'visibility_off' : 'visibility'"
+							class="cursor-pointer"
+							@click="isPwd = !isPwd"
+						/>
+					</template>
+				</q-input>
 
 				<div>
 					<q-btn
@@ -63,10 +71,11 @@ const $q = useQuasar()
 const email = ref('')
 const name = ref('')
 const password = ref('')
+const isPwd = ref(true)
 
 const errors = reactive({
-	email: { errorMsg: null, errorType: null },
 	name: { errorMsg: null, errorType: null },
+	email: { errorMsg: null, errorType: null },
 	password: { errorMsg: null, errorType: null }
 })
 
@@ -76,6 +85,16 @@ const isValidEmail = val => {
 
 const validation = () => {
 	let isError = false
+	// Name
+	if (name.value.length < 1) {
+		errors.name.errorMsg = 'Please enter your name'
+		errors.name.errorType = true
+		isError = true
+	} else {
+		errors.name.errorMsg = null
+		errors.name.errorType = null
+	}
+	// Name END
 
 	// Email
 	if (email.value.length < 1) {
@@ -91,17 +110,6 @@ const validation = () => {
 		errors.email.errorType = null
 	}
 	// Email END
-
-	// Name
-	if (name.value.length < 1) {
-		errors.name.errorMsg = 'Please enter your name'
-		errors.name.errorType = true
-		isError = true
-	} else {
-		errors.name.errorMsg = null
-		errors.name.errorType = null
-	}
-	// Name END
 
 	// Password
 	if (password.value.length < 1) {
