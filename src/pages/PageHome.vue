@@ -161,7 +161,7 @@ export default {
 		return {
 			email: '',
 			name: '',
-			avatar: '',
+			avatar: imageUser,
 			posts: [],
 			isLoading: false,
 			showNotifications: false
@@ -190,14 +190,12 @@ export default {
 						photoURL,
 						uid
 					})
-				} else {
-					this.$router.push('/auth')
 				}
-				const userData = this.$q.localStorage.getItem('userData')
-				this.email = userData.email
-				this.name = userData.displayName
-				this.avatar = userData.photoURL ? userData.photoURL : imageUser
 			})
+			const userData = this.$q.localStorage.getItem('userData')
+			this.email = userData.email
+			this.name = userData.displayName
+			this.avatar = userData.photoURL ? userData.photoURL : imageUser
 		},
 		getPosts() {
 			this.isLoading = true

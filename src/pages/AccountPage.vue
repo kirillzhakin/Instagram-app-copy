@@ -33,16 +33,6 @@
 					:error-message="errors.email.errorMsg"
 					:error="errors.email.errorType"
 				/>
-				<!-- <q-input
-					filled
-					v-model="password"
-					label="Password"
-					type="password"
-					stack-label
-					:error-message="errors.password.errorMsg"
-					:error="errors.password.errorType"
-				/> -->
-
 				<q-input
 					filled
 					v-model="password"
@@ -115,8 +105,6 @@ onMounted(() => {
 			name.value = user.displayName
 			email.value = user.email
 			avatar.value = user.photoURL ? user.photoURL : imageUser
-		} else {
-			router.push('./auth')
 		}
 	})
 })
@@ -230,21 +218,19 @@ const updateUser = async () => {
 		})
 		if ($q.platform.is.safari) {
 			setTimeout(() => {
-				window.location.href = '/auth'
+				window.location.href = '/'
 			}, 1000)
 		}
 	} catch (err) {
 		if (err.code === 'auth/requires-recent-login') {
-			userError('Please re-login to the app!')
-		}
-		if (err.code === 'auth/email-already-in-use') {
+			userError('Please re-login to the app!', 'Attention!')
+		} else if (err.code === 'auth/user-token-expired') {
+			userError('Please re-login to the app', 'Attention!')
+		} else if (err.code === 'auth/email-already-in-use') {
 			userError('That email address is already in use!')
-		}
-		if (err.code === 'auth/invalid-email') {
-			userError('That email address is invalid!')
 		} else if (err.code === 'auth/weak-password') {
 			userError('Password should be at least 6 characters!')
-		} else if (err) userError(err.message)
+		} else userError(err.message)
 		$q.loading.hide()
 		console.error(err)
 	}
@@ -255,7 +241,7 @@ const logout = () => {
 	try {
 		signOut(auth)
 		$q.loading.hide()
-		router.push('/auth')
+		router.push('/')
 		$q.notify({
 			type: 'positive',
 			color: 'primary',
@@ -265,7 +251,7 @@ const logout = () => {
 		$q.loading.hide()
 		if ($q.platform.is.safari) {
 			setTimeout(() => {
-				window.location.href = '/auth'
+				window.location.href = '/'
 			}, 1000)
 		}
 	} catch (err) {

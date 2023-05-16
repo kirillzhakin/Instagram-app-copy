@@ -1,3 +1,10 @@
+import { onAuthStateChanged } from 'firebase/auth'
+import { auth } from '../services/firebase-service'
+let isAuth = false
+onAuthStateChanged(auth, user => (user ? (isAuth = true) : (isAuth = false)))
+console.log('isAuth')
+console.log(isAuth)
+
 const routes = [
 	{
 		path: '/auth',
@@ -10,9 +17,11 @@ const routes = [
 			}
 		]
 	},
-
 	{
 		path: '/',
+		beforeEnter: (to, from) => {
+			isAuth ? true : false
+		},
 		component: () => import('layouts/MainLayout.vue'),
 		children: [
 			{ path: '/', component: () => import('pages/PageHome.vue') },
