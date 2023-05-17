@@ -72,7 +72,7 @@
 
 <script setup>
 import { auth } from '../services/firebase-service'
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, onActivated } from 'vue'
 import {
 	onAuthStateChanged,
 	updateProfile,
@@ -100,6 +100,7 @@ const errors = reactive({
 })
 
 onMounted(() => {
+	console.log('Mounted-----------------------')
 	onAuthStateChanged(auth, user => {
 		if (user) {
 			name.value = user.displayName
@@ -240,8 +241,10 @@ const logout = () => {
 	$q.loading.show()
 	try {
 		signOut(auth)
+		$q.localStorage.remove('userData')
+		$q.localStorage.remove('isAuth')
 		$q.loading.hide()
-		router.push('/')
+		router.push('/auth')
 		$q.notify({
 			type: 'positive',
 			color: 'primary',
@@ -251,7 +254,7 @@ const logout = () => {
 		$q.loading.hide()
 		if ($q.platform.is.safari) {
 			setTimeout(() => {
-				window.location.href = '/'
+				window.location.href = '/auth'
 			}, 1000)
 		}
 	} catch (err) {

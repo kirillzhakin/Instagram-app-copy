@@ -167,36 +167,8 @@ export default {
 			showNotifications: false
 		}
 	},
-	mounted() {
-		console.log(1)
-		this.authUserChange()
-	},
-
-	beforeUpdate() {
-		console.log(2)
-		this.authUserChange()
-	},
 
 	methods: {
-		authUserChange() {
-			onAuthStateChanged(auth, user => {
-				if (user) {
-					console.log('currentUser:', user.displayName)
-					const { email, displayName, photoURL, uid } = user
-					console.log(user)
-					this.$q.localStorage.set('userData', {
-						email,
-						displayName,
-						photoURL,
-						uid
-					})
-				}
-			})
-			const userData = this.$q.localStorage.getItem('userData')
-			this.email = userData.email
-			this.name = userData.displayName
-			this.avatar = userData.photoURL ? userData.photoURL : imageUser
-		},
 		getPosts() {
 			this.isLoading = true
 
@@ -385,9 +357,16 @@ export default {
 		}
 	},
 	activated() {
+		console.log('activated---------------------')
 		this.getPosts()
 	},
 	created() {
+		console.log('created---------------------')
+		const data = this.$q.localStorage.getItem('userData')
+		const user = JSON.parse(data)
+		this.email = user.email || ''
+		this.name = user.displayName || ''
+		this.avatar = user.photoURL || imageUser
 		this.listenForOfflinePostUploaded()
 		this.initNotifications()
 	}

@@ -4,7 +4,7 @@
 			<q-page-container>
 				<h1 class="page-title text-grand-hotel text-bold">Instagram</h1>
 				<router-view v-slot="{ Component }">
-					<transition appear enter-active-class="animated bounceInLeft">
+					<transition appear name="component-fade" mode="out-in">
 						<component :is="Component" />
 					</transition>
 				</router-view>
@@ -31,7 +31,6 @@ export default defineComponent({
   .q-page
     margin: 0 auto
     max-width: 500px
-
 
   .q-btn
     width: 100%

@@ -84,9 +84,11 @@
 		</q-footer>
 		<q-page-container class="bg-grey-1">
 			<router-view v-slot="{ Component }">
-				<keep-alive :include="['PageHome']">
-					<component :is="Component" />
-				</keep-alive>
+				<transition appear name="component-fade" mode="out-in">
+					<keep-alive :include="['PageHome']">
+						<component :is="Component" />
+					</keep-alive>
+				</transition>
 			</router-view>
 		</q-page-container>
 	</q-layout>
