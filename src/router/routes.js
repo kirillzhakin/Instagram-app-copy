@@ -1,12 +1,13 @@
 const routes = [
 	{
 		path: '/auth',
-
+		name: 'Login',
 		component: () => import('pages/AuthPage.vue'),
 		children: [
 			{ path: '', component: () => import('pages/auth/LoginSection.vue') },
 			{
 				path: 'register',
+				name: 'Register',
 				component: () => import('pages/auth/RegisterSection.vue')
 			}
 		]

@@ -147,21 +147,23 @@
 </template>
 
 <script>
+import qs from 'qs'
 import { date } from 'quasar'
 import { openDB } from 'idb'
-import qs from 'qs'
 import { vapidPublicKey } from '../utils/constants.js'
-import { auth } from '../services/firebase-service'
-import { onAuthStateChanged } from 'firebase/auth'
 import imageUser from '../assets/user.svg'
 
 export default {
 	name: 'PageHome',
 	data() {
+		const data = this.$q.localStorage.getItem('userData')
+		const userData = JSON.parse(data)
+
 		return {
-			email: '',
-			name: '',
-			avatar: imageUser,
+			email: userData.email || '',
+			name: userData.displayName || '',
+			avatar: userData.photoURL || imageUser,
+			userId: userData.uid || '',
 			posts: [],
 			isLoading: false,
 			showNotifications: false
@@ -178,7 +180,9 @@ export default {
 			}
 
 			this.$axios
-				.get(`${process.env.API}/posts${timestamp}`)
+				.get(`${process.env.API}/posts${timestamp}`, {
+					params: { userId: this.userId }
+				})
 				.then(({ data }) => {
 					this.posts = data
 					this.isLoading = false
@@ -357,16 +361,15 @@ export default {
 		}
 	},
 	activated() {
-		console.log('activated---------------------')
 		this.getPosts()
-	},
-	created() {
-		console.log('created---------------------')
 		const data = this.$q.localStorage.getItem('userData')
-		const user = JSON.parse(data)
-		this.email = user.email || ''
-		this.name = user.displayName || ''
-		this.avatar = user.photoURL || imageUser
+		const userData = JSON.parse(data)
+		this.email = userData.email || ''
+		this.name = userData.displayName || ''
+		this.avatar = userData.photoURL || imageUser
+	},
+
+	created() {
 		this.listenForOfflinePostUploaded()
 		this.initNotifications()
 	}

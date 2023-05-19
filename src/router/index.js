@@ -11,6 +11,7 @@ import { onAuthStateChanged } from 'firebase/auth'
 import { auth } from '../services/firebase-service'
 
 onAuthStateChanged(auth, user => {
+	console.log('index.js-----------------')
 	if (user) {
 		const { email, displayName, photoURL, uid } = user
 		localStorage.setItem(
@@ -31,13 +32,14 @@ export default route(function (/* { store, ssrContext } */) {
 	const Router = createRouter({
 		scrollBehavior: () => ({ left: 0, top: 0 }),
 		routes,
-
 		history: createHistory(process.env.VUE_ROUTER_BASE)
 	})
-	Router.beforeEach((to, from, next) => {
+
+	Router.beforeEach((to, _from, next) => {
 		console.log('beforEach-------------------------')
 		const isAuth = localStorage.getItem('isAuth')
-		if (to.path !== '/auth' && !isAuth) next('/auth')
+		if (to.path !== '/auth' && to.path !== '/auth/register' && !isAuth)
+			next('/auth')
 		else next()
 	})
 

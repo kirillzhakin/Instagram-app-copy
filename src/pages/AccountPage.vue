@@ -1,19 +1,24 @@
 <template>
 	<div id="accountMenu">
 		<q-page class="q-pa-md">
+			<q-input
+				style="display: none"
+				type="file"
+				ref="fileInputRef"
+				@change="handleFileSelection"
+			/>
 			<q-item-section>
 				<q-btn
-					ref="buttonRef"
 					round
 					color="primary"
 					class="avatar-btn"
-					@click.prevent="getFile"
+					ref="buttonRef"
+					@click="openFileInput"
 				>
 					<q-avatar size="150px">
 						<img :src="avatar" />
 					</q-avatar>
 				</q-btn>
-				<q-input ref="fileRef" style="display: none" type="file"></q-input>
 			</q-item-section>
 
 			<q-form @submit.prevent="updateUser">
@@ -33,26 +38,10 @@
 					:error-message="errors.email.errorMsg"
 					:error="errors.email.errorType"
 				/>
-				<q-input
-					filled
-					v-model="password"
-					label="Password"
-					:type="isPwd ? 'password' : 'text'"
-					stack-label
-					:error-message="errors.password.errorMsg"
-					:error="errors.password.errorType"
-				>
-					<template v-slot:append>
-						<q-icon
-							:name="isPwd ? 'visibility_off' : 'visibility'"
-							class="cursor-pointer"
-							@click="isPwd = !isPwd"
-						/>
-					</template>
-				</q-input>
+
 				<div>
 					<q-btn
-						:disable="!email || !name || !password"
+						:disable="!email || !name"
 						class="form__btn"
 						label="Update data"
 						type="submit"
@@ -90,24 +79,31 @@ const $q = useQuasar()
 const name = ref('')
 const email = ref('')
 const avatar = ref(imageUser)
-const password = ref('')
-const isPwd = ref(true)
+const fileInputRef = ref(null)
+
+onMounted(() => {
+	const data = localStorage.getItem('userData')
+	const userData = JSON.parse(data)
+	email.value = userData.email || ''
+	name.value = userData.displayName || ''
+	avatar.value = userData.photoURL || imageUser
+})
+
+const openFileInput = () => {
+	console.log('111111111111111111')
+	fileInputRef.value.click()
+}
+
+const handleFileSelection = event => {
+	console.log('222222222222222222222')
+	const selectedFile = event.target.files[0]
+	console.log(selectedFile)
+}
 
 const errors = reactive({
 	name: { errorMsg: null, errorType: null },
 	email: { errorMsg: null, errorType: null },
 	password: { errorMsg: null, errorType: null }
-})
-
-onMounted(() => {
-	console.log('Mounted-----------------------')
-	onAuthStateChanged(auth, user => {
-		if (user) {
-			name.value = user.displayName
-			email.value = user.email
-			avatar.value = user.photoURL ? user.photoURL : imageUser
-		}
-	})
 })
 
 const isValidEmail = val => {
@@ -142,20 +138,6 @@ const validation = () => {
 	}
 	// Email END
 
-	// Password
-	if (password.value.length < 1) {
-		errors.password.errorMsg = 'Please enter your password'
-		errors.password.errorType = true
-		isError = true
-	} else if (password.value.length > 0 && password.value.length < 6) {
-		errors.password.errorMsg = 'The minimum password length is 6 characters'
-		errors.password.errorType = true
-		isError = true
-	} else {
-		errors.password.errorMsg = null
-		errors.password.errorType = null
-	}
-	// Password END
 	return isError
 }
 
@@ -164,11 +146,6 @@ const userError = (message = 'Upps...', title = 'Error') => {
 		message,
 		title
 	})
-}
-
-const getFile = () => {
-	console.log(5)
-	console.log(fileRef.value)
 }
 
 const userUpdateData = async user => {
@@ -180,9 +157,7 @@ const userUpdateData = async user => {
 const userUpdateEmail = async user => {
 	await updateEmail(user, email.value)
 }
-const userUpdatePassword = async user => {
-	await updatePassword(user, password.value)
-}
+
 const updateUser = async () => {
 	const isError = validation()
 
@@ -205,11 +180,19 @@ const updateUser = async () => {
 	if (name.value) {
 		promises.push(userUpdateData(currentUser))
 	}
-	if (password.value) {
-		promises.push(userUpdatePassword(currentUser))
-	}
+
 	try {
 		await Promise.all(promises)
+		onAuthStateChanged(auth, user => {
+			console.log('onAuthStateChanged.js-----------------')
+			if (user) {
+				const { email, displayName, photoURL, uid } = user
+				localStorage.setItem(
+					'userData',
+					JSON.stringify({ email, displayName, photoURL, uid })
+				)
+			}
+		})
 		router.push('/')
 		$q.loading.hide()
 		$q.notify({
@@ -229,8 +212,6 @@ const updateUser = async () => {
 			userError('Please re-login to the app', 'Attention!')
 		} else if (err.code === 'auth/email-already-in-use') {
 			userError('That email address is already in use!')
-		} else if (err.code === 'auth/weak-password') {
-			userError('Password should be at least 6 characters!')
 		} else userError(err.message)
 		$q.loading.hide()
 		console.error(err)

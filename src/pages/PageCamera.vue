@@ -77,20 +77,20 @@
 <script>
 import { uid } from 'quasar'
 
-// require('md-gum-polyfill')
-
-// ... code using getUserMedia...
-
 export default {
 	name: 'PageCamera',
 	data() {
+		const data = this.$q.localStorage.getItem('userData')
+		const userData = JSON.parse(data)
+		console.log(userData)
 		return {
 			post: {
 				id: uid(),
 				caption: '',
 				location: '',
 				photo: null,
-				date: Date.now()
+				date: Date.now(),
+				userId: userData.uid
 			},
 			imgCaptured: false,
 			imgUpload: [],
@@ -221,7 +221,8 @@ export default {
 				postData.append('location', this.post.location)
 				postData.append('date', this.post.date)
 				postData.append('file', this.post.photo, this.post.id + '.png')
-
+				postData.append('userId', this.post.userId)
+				console.log(postData)
 				this.$axios
 					.post(`${process.env.API}/createPost`, postData)
 					.then(_res => {
