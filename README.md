@@ -52,4 +52,5 @@ to-do-list/commits
 47. fix form update
 48. add routing
 49. fixing routing problem
+50. add delete post
     Hosting URL: https://chromium-d89a6.web.app

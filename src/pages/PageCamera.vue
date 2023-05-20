@@ -13,12 +13,11 @@
 			<q-btn
 				v-if="hasCamera"
 				@click="getImage"
-				:disable="imgCaptured"
+				:disable="isCamera"
 				round
 				color="grey-10"
 				icon="eva-camera"
 			/>
-
 			<q-file
 				v-else
 				outlined
@@ -95,7 +94,8 @@ export default {
 			imgCaptured: false,
 			imgUpload: [],
 			hasCamera: true,
-			isLoading: false
+			isLoading: false,
+			isCamera: true
 		}
 	},
 
@@ -116,7 +116,10 @@ export default {
 				.getUserMedia({
 					video: true
 				})
-				.then(stream => (this.$refs.video.srcObject = stream))
+				.then(stream => {
+					this.$refs.video.srcObject = stream
+					this.isCamera = false
+				})
 				.catch(_err => (this.hasCamera = false))
 		},
 		getImage() {
@@ -130,6 +133,7 @@ export default {
 			this.imgCaptured = true
 			this.post.photo = this.dataURItoBlob(canvas.toDataURL())
 			this.disableCamera()
+			this.isCamera = true
 		},
 
 		getImageFile(file) {

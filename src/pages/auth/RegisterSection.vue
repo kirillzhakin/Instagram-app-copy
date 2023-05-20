@@ -180,9 +180,7 @@ const registerUser = async () => {
 	} catch (err) {
 		if (err.code === 'auth/email-already-in-use') {
 			userError('That email address is already in use!')
-		}
-
-		if (err.code === 'auth/invalid-email') {
+		} else if (err.code === 'auth/invalid-email') {
 			userError('That email address is invalid!')
 		} else if (err.code === 'auth/weak-password') {
 			userError('Password should be at least 6 characters!')

@@ -82,11 +82,21 @@
 
 						<q-img :src="post.imageUrl" />
 
-						<q-card-section>
-							<div>{{ post.caption }}</div>
-							<div class="text-caption text-gray">
-								{{ viewDate(post.date) }}
+						<q-card-section class="row justify-between">
+							<div>
+								<div>{{ post.caption }}</div>
+								<div class="text-caption text-gray">
+									{{ viewDate(post.date) }}
+								</div>
 							</div>
+							<q-btn
+								flat
+								round
+								dense
+								size="18px"
+								icon="eva-trash-outline"
+								@click="deletePost(post.id)"
+							/>
 						</q-card-section>
 					</q-card>
 				</template>
@@ -171,6 +181,52 @@ export default {
 	},
 
 	methods: {
+		deletePost(id) {
+			this.$q.loading.show()
+
+			if (this.$q.platform.is.android && !postCreated && !navigator.onLine) {
+				this.addPostError()
+				this.$q.loading.hide()
+			} else {
+				this.$axios
+					.delete(`${process.env.API}/deletePost`, {
+						params: {
+							id
+						}
+					})
+					.then(res => {
+						if (res.status === 200) {
+							this.posts = this.posts.filter(post => post.id !== id)
+							this.$q.notify({
+								message: 'Post deleted!',
+								actions: [
+									{
+										label: 'Dismiss',
+										color: 'white'
+									}
+								]
+							})
+						}
+						this.$q.loading.hide()
+					})
+					.catch(err => {
+						console.log(err)
+						if (!navigator.onLine && this.isSyncSupported && postCreated) {
+							this.$q.notify('Post deleted offline')
+							this.$router.push('/')
+						} else {
+							this.addPostError()
+						}
+						this.$q.loading.hide()
+					})
+			}
+		},
+		addPostError() {
+			this.$q.dialog({
+				title: 'Error',
+				message: 'Sory, could not delete post'
+			})
+		},
 		getPosts() {
 			this.isLoading = true
 
@@ -184,6 +240,7 @@ export default {
 					params: { userId: this.userId }
 				})
 				.then(({ data }) => {
+					console.log(data)
 					this.posts = data
 					this.isLoading = false
 					if (!navigator.onLine) {
