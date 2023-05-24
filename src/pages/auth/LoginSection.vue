@@ -128,8 +128,8 @@ const loginUser = async () => {
 		const message =
 			'Your login was unsuccessful. Please make sure that you are connected to the internet.'
 		const title = 'Offline'
-		userError(message, title)
 		$q.loading.hide()
+		userError(message, title)
 	}
 
 	try {

@@ -35,7 +35,6 @@ if (backgroundSyncSupported) {
 				} catch (error) {
 					console.error('Replay failed for request', entry.request, error)
 
-					// Put the entry back in the queue and re-throw the error:
 					await queue.unshiftRequest(entry)
 					throw error
 				}
@@ -67,20 +66,23 @@ registerRoute(
 )
 
 registerRoute(
-	({ url }) => url.href.startsWith('http'),
-	new StaleWhileRevalidate()
+	({ url }) => {
+    console.log(url),
+    url.href.startsWith('http')
+  },
+  new StaleWhileRevalidate()
 )
 
 // Events - fetch
 if (backgroundSyncSupported) {
 	self.addEventListener('fetch', event => {
+    console.log('event>>>>>>', event);
 		if (event.request.url.endsWith('/createPost')) {
-			// Клонируем запрос для безопасного чтения
-			// при добавлении в очередь
 			if (!self.navigator.onLine) {
 				const promiseChain = fetch(event.request.clone()).catch(_err => {
 					return createPost.pushRequest({ request: event.request })
 				})
+        console.log('promiseChain>>>>>>>>>>>', promiseChain);
 				event.waitUntil(promiseChain)
 			}
 		}

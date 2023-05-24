@@ -1,7 +1,7 @@
 <template>
 	<div id="accountMenu">
 		<q-page class="q-pa-md">
-			<q-input
+			<input
 				style="display: none"
 				type="file"
 				ref="fileInputRef"
@@ -90,13 +90,12 @@ onMounted(() => {
 })
 
 const openFileInput = () => {
-	console.log('111111111111111111')
 	fileInputRef.value.click()
 }
 
 const handleFileSelection = event => {
-	console.log('222222222222222222222')
 	const selectedFile = event.target.files[0]
+  avatar.value = URL.createObjectURL(selectedFile)
 	console.log(selectedFile)
 }
 
@@ -150,7 +149,7 @@ const userError = (message = 'Upps...', title = 'Error') => {
 
 const userUpdateData = async user => {
 	await updateProfile(user, {
-		photoURL: null,
+		photoURL: avatar.value,
 		displayName: name.value
 	})
 }
@@ -257,6 +256,7 @@ const logout = () => {
 
   .avatar-btn
     margin: 40px auto
+    background-color: transparent
 
   .form__btn
     width: 100%
@@ -278,4 +278,7 @@ const logout = () => {
     background-color: transparent
     cursor: pointer
     height: 20px
+
+  .option-btn:hover
+    opacity: 0.3
 </style>

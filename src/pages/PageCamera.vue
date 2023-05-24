@@ -81,7 +81,6 @@ export default {
 	data() {
 		const data = this.$q.localStorage.getItem('userData')
 		const userData = JSON.parse(data)
-		console.log(userData)
 		return {
 			post: {
 				id: uid(),
@@ -226,7 +225,6 @@ export default {
 				postData.append('date', this.post.date)
 				postData.append('file', this.post.photo, this.post.id + '.png')
 				postData.append('userId', this.post.userId)
-				console.log(postData)
 				this.$axios
 					.post(`${process.env.API}/createPost`, postData)
 					.then(_res => {
