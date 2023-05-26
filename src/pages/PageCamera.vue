@@ -152,6 +152,7 @@ export default {
 			}
 			reader.readAsDataURL(file)
 		},
+
 		disableCamera() {
 			this.$refs.video.srcObject.getVideoTracks().forEach(track => track.stop())
 		},
@@ -169,7 +170,6 @@ export default {
 		},
 
 		getLocation() {
-			console.log('getLocation')
 			this.isLoading = true
 			navigator.geolocation.getCurrentPosition(
 				position => {

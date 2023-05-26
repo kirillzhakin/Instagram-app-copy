@@ -240,7 +240,6 @@ export default {
 					params: { userId: this.userId }
 				})
 				.then(({ data }) => {
-					console.log(data)
 					this.posts = data
 					this.isLoading = false
 					if (!navigator.onLine) {
@@ -316,7 +315,6 @@ export default {
 		getNotifications() {
 			if (this.isNotificationsSupported) {
 				Notification.requestPermission(res => {
-					console.log(res)
 					this.neverShowNotifications()
 					if (res === 'granted') {
 						// this.viewGrantedNotifications()
@@ -355,7 +353,6 @@ export default {
 					)
 				})
 				.then(res => {
-					console.log(res)
 					this.viewGrantedNotifications()
 				})
 				.catch(err => console.log(err))

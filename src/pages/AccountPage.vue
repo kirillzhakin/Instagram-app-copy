@@ -60,7 +60,8 @@
 </template>
 
 <script setup>
-import { auth } from '../services/firebase-service'
+import { auth, upload } from '../services/firebase-service'
+
 import { ref, reactive, onMounted, onActivated } from 'vue'
 import {
 	onAuthStateChanged,
@@ -88,16 +89,6 @@ onMounted(() => {
 	name.value = userData.displayName || ''
 	avatar.value = userData.photoURL || imageUser
 })
-
-const openFileInput = () => {
-	fileInputRef.value.click()
-}
-
-const handleFileSelection = event => {
-	const selectedFile = event.target.files[0]
-  avatar.value = URL.createObjectURL(selectedFile)
-	console.log(selectedFile)
-}
 
 const errors = reactive({
 	name: { errorMsg: null, errorType: null },
@@ -147,12 +138,30 @@ const userError = (message = 'Upps...', title = 'Error') => {
 	})
 }
 
+const openFileInput = () => {
+	fileInputRef.value.click()
+}
+
+const handleFileSelection = async event => {
+	$q.loading.show()
+	if (event.target.files[0]) {
+		const selectedFile = event.target.files[0]
+		const currentUser = auth.currentUser
+		const avatarPhoto = await upload(selectedFile, currentUser)
+		avatar.value = avatarPhoto
+		$q.loading.hide()
+	} else {
+		userError('The file was not loaded')
+	}
+}
+
 const userUpdateData = async user => {
 	await updateProfile(user, {
 		photoURL: avatar.value,
 		displayName: name.value
 	})
 }
+
 const userUpdateEmail = async user => {
 	await updateEmail(user, email.value)
 }
@@ -183,7 +192,6 @@ const updateUser = async () => {
 	try {
 		await Promise.all(promises)
 		onAuthStateChanged(auth, user => {
-			console.log('onAuthStateChanged.js-----------------')
 			if (user) {
 				const { email, displayName, photoURL, uid } = user
 				localStorage.setItem(

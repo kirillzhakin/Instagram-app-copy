@@ -53,4 +53,6 @@ to-do-list/commits
 48. add routing
 49. fixing routing problem
 50. add delete post
+51. add hahdle avatar
+52. add upload avatar
     Hosting URL: https://chromium-d89a6.web.app

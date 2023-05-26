@@ -138,9 +138,8 @@ const loginUser = async () => {
 			email.value,
 			password.value
 		)
-		console.log(user)
 		if (user !== null) {
-			console.log(`Welcome back ${user.displayName}!`)
+			console.log(`Welcome ${user.displayName}!`)
 			router.push('/')
 			$q.notify({
 				type: 'positive',
