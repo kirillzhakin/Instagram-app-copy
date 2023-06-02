@@ -77,18 +77,14 @@ import imageUser from '../assets/user.svg'
 
 const router = useRouter()
 const $q = useQuasar()
-const name = ref('')
-const email = ref('')
-const avatar = ref(imageUser)
-const fileInputRef = ref(null)
 
-onMounted(() => {
-	const data = localStorage.getItem('userData')
-	const userData = JSON.parse(data)
-	email.value = userData.email || ''
-	name.value = userData.displayName || ''
-	avatar.value = userData.photoURL || imageUser
-})
+const data = localStorage.getItem('userData')
+const userData = JSON.parse(data)
+
+const name = ref(userData.displayName || '')
+const email = ref(userData.email || '')
+const avatar = ref(userData.photoURL || imageUser)
+const fileInputRef = ref(null)
 
 const errors = reactive({
 	name: { errorMsg: null, errorType: null },
@@ -180,8 +176,10 @@ const updateUser = async () => {
 
 		$q.loading.hide()
 	}
+
 	const currentUser = auth.currentUser
 	const promises = []
+
 	if (email.value) {
 		promises.push(userUpdateEmail(currentUser))
 	}

@@ -9,17 +9,12 @@ import { CacheableResponsePlugin } from 'workbox-cacheable-response'
 import { ExpirationPlugin } from 'workbox-expiration'
 import { Queue } from 'workbox-background-sync'
 
-/*
- * This file (which will be your service worker)
- * is picked up by the build system ONLY if
- * quasar.conf > pwa > workboxPluginMode is set to "InjectManifest"
- */
-
 // PreCaching
 precacheAndRoute(self.__WB_MANIFEST)
 
 // Queue - createPost
 const backgroundSyncSupported = 'sync' in self.registration ? true : false
+
 let createPost = null
 
 if (backgroundSyncSupported) {
@@ -34,7 +29,6 @@ if (backgroundSyncSupported) {
 					channel.postMessage({ message: 'offline-post-uploaded' })
 				} catch (error) {
 					console.error('Replay failed for request', entry.request, error)
-
 					await queue.unshiftRequest(entry)
 					throw error
 				}
@@ -66,23 +60,18 @@ registerRoute(
 )
 
 registerRoute(
-	({ url }) => {
-    console.log(url),
-    url.href.startsWith('http')
-  },
-  new StaleWhileRevalidate()
+	({ url }) => url.href.startsWith('http'),
+	new StaleWhileRevalidate()
 )
 
 // Events - fetch
 if (backgroundSyncSupported) {
 	self.addEventListener('fetch', event => {
-    console.log('event>>>>>>', event);
 		if (event.request.url.endsWith('/createPost')) {
 			if (!self.navigator.onLine) {
 				const promiseChain = fetch(event.request.clone()).catch(_err => {
 					return createPost.pushRequest({ request: event.request })
 				})
-        console.log('promiseChain>>>>>>>>>>>', promiseChain);
 				event.waitUntil(promiseChain)
 			}
 		}
@@ -92,8 +81,6 @@ if (backgroundSyncSupported) {
 self.addEventListener('push', event => {
 	if (event.data) {
 		const data = JSON.parse(event.data.text())
-		console.log(data)
-
 		event.waitUntil(
 			self.registration.showNotification(data.title, {
 				body: data.body,
@@ -109,8 +96,6 @@ self.addEventListener('push', event => {
 })
 
 self.addEventListener('notificationclick', event => {
-	console.log(event.notification)
-	console.log(event.notification.data)
 	if (event.action === 'hello') {
 		console.log(event.action)
 	} else if (event.action === 'goodbye') {

@@ -144,7 +144,7 @@ const loginUser = async () => {
 			$q.notify({
 				type: 'positive',
 				color: 'primary',
-				message: `Welcome back ${user.displayName}!`
+				message: `Welcome ${user.displayName}!`
 			})
 		}
 		$q.loading.hide()

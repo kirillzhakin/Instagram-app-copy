@@ -48,7 +48,7 @@
 
 		<div class="row q-col-gutter-lg">
 			<div class="col-12 col-sm-8">
-				<template v-if="!isLoading && posts.length">
+				<template v-if="!isLoading && postsLength(posts)">
 					<q-card
 						v-for="post in posts"
 						:key="post.id"
@@ -101,7 +101,7 @@
 					</q-card>
 				</template>
 
-				<template v-else-if="!isLoading && !posts.length">
+				<template v-else-if="!isLoading && !postsLength(posts)">
 					<h5 class="text-center text-grey">No posts</h5>
 				</template>
 
@@ -156,278 +156,260 @@
 	</q-page>
 </template>
 
-<script>
+<script setup>
 import qs from 'qs'
+import axios from 'axios'
 import { date } from 'quasar'
 import { openDB } from 'idb'
+import { onActivated, computed, ref } from 'vue'
+
+import { useRouter } from 'vue-router'
+import { useQuasar } from 'quasar'
+
 import { vapidPublicKey } from '../utils/constants.js'
 import imageUser from '../assets/user.svg'
 
-export default {
-	name: 'PageHome',
-	data() {
-		const data = this.$q.localStorage.getItem('userData')
-		const userData = JSON.parse(data)
+const router = useRouter()
+const $q = useQuasar()
 
-		return {
-			email: userData.email || '',
-			name: userData.displayName || '',
-			avatar: userData.photoURL || imageUser,
-			userId: userData.uid || '',
-			posts: [],
-			isLoading: false,
-			showNotifications: false
-		}
-	},
+onActivated(() => {
+	getPosts()
+	const data = localStorage.getItem('userData')
+	const userData = JSON.parse(data)
+	email.value = userData.email || ''
+	name.value = userData.displayName || ''
+	avatar.value = userData.photoURL || imageUser
+})
 
-	methods: {
-		deletePost(id) {
-			this.$q.loading.show()
+const data = localStorage.getItem('userData')
+const userData = JSON.parse(data)
 
-			if (this.$q.platform.is.android && !postCreated && !navigator.onLine) {
-				this.addPostError()
-				this.$q.loading.hide()
-			} else {
-				this.$axios
-					.delete(`${process.env.API}/deletePost`, {
-						params: {
-							id
-						}
-					})
-					.then(res => {
-						if (res.status === 200) {
-							this.posts = this.posts.filter(post => post.id !== id)
-							this.$q.notify({
-								message: 'Post deleted!',
-								actions: [
-									{
-										label: 'Dismiss',
-										color: 'white'
-									}
-								]
-							})
-						}
-						this.$q.loading.hide()
-					})
-					.catch(err => {
-						console.log(err)
-						if (!navigator.onLine && this.isSyncSupported && postCreated) {
-							this.$q.notify('Post deleted offline')
-							this.$router.push('/')
-						} else {
-							this.addPostError()
-						}
-						this.$q.loading.hide()
-					})
-			}
-		},
-		addPostError() {
-			this.$q.dialog({
-				title: 'Error',
-				message: 'Sory, could not delete post'
+const email = ref(userData.email || '')
+const name = ref(userData.displayName || '')
+const avatar = ref(userData.photoURL || imageUser)
+const userId = ref(userData.uid || '')
+const posts = ref([])
+const isLoading = ref(false)
+const showNotifications = ref(false)
+
+const postsLength = computed(() => posts => posts.length)
+const viewDate = computed(() => value => date.formatDate(value, 'DD MMM YYYY'))
+const isSupported = computed(() =>
+	'serviceWorker' in navigator ? true : false
+)
+const isNotificationsSupported = computed(() =>
+	'PushManager' in window ? true : false
+)
+
+const deletePost = id => {
+	$q.loading.show()
+
+	if ($q.platform.is.android && !postCreated && !navigator.onLine) {
+		addPostError()
+		$q.loading.hide()
+	} else {
+		axios
+			.delete(`${process.env.API}/deletePost`, {
+				params: {
+					id
+				}
 			})
-		},
-		getPosts() {
-			this.isLoading = true
-
-			let timestamp = ''
-			if (this.$q.platform.is.ie) {
-				timestamp = '?timestamp=' + Date.now()
-			}
-
-			this.$axios
-				.get(`${process.env.API}/posts${timestamp}`, {
-					params: { userId: this.userId }
-				})
-				.then(({ data }) => {
-					this.posts = data
-					this.isLoading = false
-					if (!navigator.onLine) {
-						this.getOfflinePosts()
-					}
-				})
-				.catch(_err => {
-					this.$q.dialog({
-						title: 'Error',
-						message: 'Posts not found'
+			.then(res => {
+				if (res.status === 200) {
+					posts.value = posts.value.filter(post => post.id !== id)
+					$q.notify({
+						message: 'Post deleted!',
+						actions: [
+							{
+								label: 'Dismiss',
+								color: 'white'
+							}
+						]
 					})
-					this.isLoading = false
-				})
-		},
-		getOfflinePosts() {
-			const db = openDB('workbox-background-sync').then(db => {
-				db.getAll('requests')
-					.then(badRequests => {
-						{
-							badRequests.forEach(req => {
-								if (req.queueName === 'createPost') {
-									const request = new Request(
-										req.requestData.url,
-										req.requestData
-									)
-									request.formData().then(formData => {
-										let offlinePost = {}
-										offlinePost.id = formData.get('id')
-										offlinePost.caption = formData.get('caption')
-										offlinePost.location = formData.get('location')
-										offlinePost.date = parseInt(formData.get('date'))
-										offlinePost.offline = true
+				}
+				$q.loading.hide()
+			})
+			.catch(err => {
+				console.log(err)
+				if (!navigator.onLine) {
+					$q.notify('Post deleted offline')
+					router.push('/')
+				} else {
+					addPostError()
+				}
+				$q.loading.hide()
+			})
+	}
+}
 
-										let reader = new FileReader()
-										reader.readAsDataURL(formData.get('file'))
-										reader.onloadend = () => {
-											offlinePost.imageUrl = reader.result
-											this.posts.unshift(offlinePost)
-										}
-									})
+const addPostError = () => {
+	$q.dialog({
+		title: 'Error',
+		message: 'Sory, could not delete post'
+	})
+}
+
+const getPosts = () => {
+	isLoading.value = true
+
+	let timestamp = ''
+	if ($q.platform.is.ie) {
+		timestamp = '?timestamp=' + Date.now()
+	}
+	axios
+		.get(`${process.env.API}/posts${timestamp}`, {
+			params: { userId: userId.value }
+		})
+		.then(({ data }) => {
+			posts.value = [...data]
+			isLoading.value = false
+			if (!navigator.onLine) {
+				getOfflinePosts()
+			}
+		})
+		.catch(_err => {
+			$q.dialog({
+				title: 'Error',
+				message: 'Posts not found'
+			})
+			isLoading.value = false
+		})
+}
+const getOfflinePosts = () => {
+	const db = openDB('workbox-background-sync').then(db => {
+		db.getAll('requests')
+			.then(badRequests => {
+				{
+					badRequests.forEach(req => {
+						if (req.queueName === 'createPost') {
+							const request = new Request(req.requestData.url, req.requestData)
+							request.formData().then(formData => {
+								let offlinePost = {}
+								offlinePost.id = formData.get('id')
+								offlinePost.caption = formData.get('caption')
+								offlinePost.location = formData.get('location')
+								offlinePost.date = parseInt(formData.get('date'))
+								offlinePost.offline = true
+
+								let reader = new FileReader()
+								reader.readAsDataURL(formData.get('file'))
+								reader.onloadend = () => {
+									offlinePost.imageUrl = reader.result
+									posts.value.unshift(offlinePost)
 								}
 							})
 						}
 					})
-					.catch(err => {
-						console.log('Error IndexDB:', err)
-					})
+				}
 			})
-		},
-		listenForOfflinePostUploaded() {
-			if (this.isSupported) {
-				const channel = new BroadcastChannel('sw-message')
-				channel.addEventListener('message', event => {
-					console.log('Recived', event.data)
-					if (event.data.message === 'offline-post-uploaded') {
-						const offlinePostsLength = this.posts.filter(
-							post => post.offline === true
-						).length
-						this.posts[offlinePostsLength - 1].offline = false
-					}
-				})
+			.catch(err => {
+				console.log('Error IndexDB:', err)
+			})
+	})
+}
+const listenForOfflinePostUploaded = () => {
+	if (isSupported.value) {
+		const channel = new BroadcastChannel('sw-message')
+		channel.addEventListener('message', event => {
+			console.log('Recived', event.data)
+			if (event.data.message === 'offline-post-uploaded') {
+				const offlinePostsLength = posts.value.filter(
+					post => post.offline === true
+				).length
+				posts[offlinePostsLength - 1].offline = false
 			}
-		},
-		initNotifications() {
-			const dontShowNotifications = this.$q.localStorage.getItem(
-				'neverShowNotifications'
-			)
-
-			if (!dontShowNotifications) {
-				this.showNotifications = true
-			}
-		},
-		getNotifications() {
-			if (this.isNotificationsSupported) {
-				Notification.requestPermission(res => {
-					this.neverShowNotifications()
-					if (res === 'granted') {
-						// this.viewGrantedNotifications()
-						this.checkPushSubscribtion()
-					}
-				})
-			}
-		},
-		checkPushSubscribtion() {
-			if (this.isSupported && this.isNotificationsSupported) {
-				let registration
-				navigator.serviceWorker.ready
-					.then(sw => {
-						registration = sw
-						return sw.pushManager.getSubscription()
-					})
-					.then(sub => {
-						if (!sub) {
-							this.createPushSubscription(registration)
-						}
-					})
-			}
-		},
-		createPushSubscription(registration) {
-			const publicKey = vapidPublicKey
-			registration.pushManager
-				.subscribe({
-					userVisibleOnly: true,
-					applicationServerKey: publicKey
-				})
-				.then(sub => {
-					const subData = sub.toJSON()
-					const subDataQS = qs.stringify(subData)
-					return this.$axios.post(
-						`${process.env.API}/createSubscription?${subDataQS}`
-					)
-				})
-				.then(res => {
-					this.viewGrantedNotifications()
-				})
-				.catch(err => console.log(err))
-		},
-		viewGrantedNotifications() {
-			// new Notification("You're subscribed to notifications", {
-			// 	body: 'Thanks for subscribing',
-			// 	icon: '/icons/favicon-128x128.png',
-			// 	badge: '/icons/favicon-128x128.png',
-			// 	dir: 'ltr',
-			// 	lang: 'en-US',
-			// 	vibrate: [100, 50, 200],
-			// 	tag: 'confirm-notifications',
-			// 	renotify: true
-			// })
-
-			if (this.isSupported && this.isNotificationsSupported) {
-				navigator.serviceWorker.ready.then(sw =>
-					sw.showNotification("You're subscribed to notifications", {
-						body: 'Thanks for subscribing',
-						icon: '/icons/favicon-128x128.png',
-						badge: '/icons/favicon-128x128.png',
-						dir: 'ltr',
-						lang: 'en-US',
-						vibrate: [100, 50, 200],
-						tag: 'confirm-notifications',
-						renotify: true,
-						actions: [
-							{
-								action: 'hello',
-								title: 'Hello',
-								icon: '/icons/favicon-128x128.png'
-							},
-							{
-								action: 'goodbye',
-								title: 'Goodbye',
-								icon: '/icons/favicon-128x128.png'
-							}
-						]
-					})
-				)
-			}
-		},
-		neverShowNotifications() {
-			this.showNotifications = false
-			this.$q.localStorage.set('neverShowNotifications', true)
-		}
-	},
-	computed: {
-		viewDate() {
-			return value => date.formatDate(value, 'DD MMM YYYY')
-		},
-		isSupported() {
-			if ('serviceWorker' in navigator) return true
-			return false
-		},
-		isNotificationsSupported() {
-			if ('PushManager' in window) return true
-			return false
-		}
-	},
-	activated() {
-		this.getPosts()
-		const data = this.$q.localStorage.getItem('userData')
-		const userData = JSON.parse(data)
-		this.email = userData.email || ''
-		this.name = userData.displayName || ''
-		this.avatar = userData.photoURL || imageUser
-	},
-
-	created() {
-		this.listenForOfflinePostUploaded()
-		this.initNotifications()
+		})
 	}
 }
+
+const initNotifications = () => {
+	const neverShowNotifications = localStorage.getItem('neverShowNotifications')
+	if (!neverShowNotifications) {
+		showNotifications.value = true
+	}
+}
+
+const getNotifications = () => {
+	if (isNotificationsSupported.value) {
+		Notification.requestPermission(res => {
+			neverShowNotifications()
+			if (res === 'granted') {
+				checkPushSubscribtion()
+			}
+		})
+	}
+}
+
+const checkPushSubscribtion = async () => {
+	if (isSupported.value && isNotificationsSupported.value) {
+		let registration
+		navigator.serviceWorker.ready
+			.then(sw => {
+				registration = sw
+				return sw.pushManager.getSubscription()
+			})
+			.then(sub => {
+				if (!sub) {
+					createPushSubscription(registration)
+				}
+			})
+			.catch(err => console.log(err))
+	}
+}
+const createPushSubscription = registration => {
+	const publicKey = vapidPublicKey
+	registration.pushManager
+		.subscribe({
+			userVisibleOnly: true,
+			applicationServerKey: publicKey
+		})
+		.then(sub => {
+			const subData = sub.toJSON()
+			const subDataQS = qs.stringify(subData)
+			return axios.post(`${process.env.API}/createSubscription?${subDataQS}`)
+		})
+		.then(_res => {
+			viewGrantedNotifications()
+		})
+		.catch(err => console.log(err))
+}
+
+const viewGrantedNotifications = () => {
+	if (isSupported.value && isNotificationsSupported.value) {
+		navigator.serviceWorker.ready.then(sw =>
+			sw.showNotification("You're subscribed to notifications", {
+				body: 'Thanks for subscribing',
+				icon: '/icons/favicon-128x128.png',
+				badge: '/icons/favicon-128x128.png',
+				dir: 'ltr',
+				lang: 'en-US',
+				vibrate: [100, 50, 200],
+				tag: 'confirm-notifications',
+				renotify: true,
+				actions: [
+					{
+						action: 'hello',
+						title: 'Hello',
+						icon: '/icons/favicon-128x128.png'
+					},
+					{
+						action: 'goodbye',
+						title: 'Goodbye',
+						icon: '/icons/favicon-128x128.png'
+					}
+				]
+			})
+		)
+	}
+}
+
+const neverShowNotifications = () => {
+	showNotifications.value = false
+	localStorage.setItem('neverShowNotifications', true)
+}
+
+listenForOfflinePostUploaded()
+initNotifications()
 </script>
 
 <style lang="sass">

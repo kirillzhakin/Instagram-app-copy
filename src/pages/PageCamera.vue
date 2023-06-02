@@ -73,207 +73,212 @@
 	</q-page>
 </template>
 
-<script>
+<script setup>
 import { uid } from 'quasar'
 
-export default {
-	name: 'PageCamera',
-	data() {
-		const data = this.$q.localStorage.getItem('userData')
-		const userData = JSON.parse(data)
-		return {
-			post: {
-				id: uid(),
-				caption: '',
-				location: '',
-				photo: null,
-				date: Date.now(),
-				userId: userData.uid
-			},
-			imgCaptured: false,
-			imgUpload: [],
-			hasCamera: true,
-			isLoading: false,
-			isCamera: true
+import axios from 'axios'
+import { date } from 'quasar'
+import { openDB } from 'idb'
+import { onMounted, onBeforeUnmount, computed, ref } from 'vue'
+
+import { useRouter } from 'vue-router'
+import { useQuasar } from 'quasar'
+
+const router = useRouter()
+const $q = useQuasar()
+
+const data = localStorage.getItem('userData')
+const userData = JSON.parse(data)
+
+const post = ref({
+	id: uid(),
+	caption: '',
+	location: '',
+	photo: null,
+	date: Date.now(),
+	userId: userData.uid
+})
+
+const canvas = ref(null)
+const video = ref(null)
+const imgUpload = ref([])
+const isLoading = ref(false)
+const imgCaptured = ref(false)
+const isCamera = ref(true)
+const hasCamera = ref(true)
+
+const isSupported = computed(() => ('geolocation' in navigator ? true : false))
+
+const isSyncSupported = () =>
+	'serviceWorker' in navigator && 'SyncManager' in window ? true : false
+
+const getCamera = () => {
+	navigator.mediaDevices
+		.getUserMedia({
+			video: true
+		})
+		.then(stream => {
+			video.value.srcObject = stream
+			isCamera.value = false
+		})
+		.catch(err => {
+			console.log(err)
+			hasCamera.value = false
+		})
+}
+
+const getImage = () => {
+	canvas.value.width = video.value.getBoundingClientRect().width
+	canvas.value.height = video.value.getBoundingClientRect().height
+	canvas.value
+		.getContext('2d')
+		.drawImage(video.value, 0, 0, canvas.value.width, canvas.value.height)
+	imgCaptured.value = true
+	post.value.photo = dataURItoBlob(canvas.value.toDataURL())
+	disableCamera()
+	isCamera.value = true
+}
+
+const getImageFile = file => {
+	post.value.photo = file
+	var reader = new FileReader()
+	reader.onload = event => {
+		var img = new Image()
+		img.onload = () => {
+			canvas.value.width = img.width
+			canvas.value.height = img.height
+			canvas.value.getContext('2d').drawImage(img, 0, 0)
+			imgCaptured.value = true
 		}
-	},
+		img.src = event.target.result
+	}
+	reader.readAsDataURL(file)
+}
 
-	computed: {
-		isSupported() {
-			if ('geolocation' in navigator) return true
-			return false
+const disableCamera = () => {
+	video.value.srcObject.getVideoTracks().forEach(track => track.stop())
+}
+
+const dataURItoBlob = dataURI => {
+	var byteString = atob(dataURI.split(',')[1])
+	var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
+	var ab = new ArrayBuffer(byteString.length)
+	var ia = new Uint8Array(ab)
+	for (var i = 0; i < byteString.length; i++) {
+		ia[i] = byteString.charCodeAt(i)
+	}
+	var blob = new Blob([ab], { type: mimeString })
+	return blob
+}
+
+const getLocation = () => {
+	isLoading.value = true
+	navigator.geolocation.getCurrentPosition(
+		position => {
+			getMyPosition(position)
 		},
-		isSyncSupported() {
-			if ('serviceWorker' in navigator && 'SyncManager' in window) return true
-			return false
-		}
-	},
+		_err => {
+			locationError()
+		},
+		{ timeout: 7000 }
+	)
+}
 
-	methods: {
-		getCamera() {
-			navigator.mediaDevices
-				.getUserMedia({
-					video: true
+const getMyPosition = position => {
+	const url = `https://geocode.maps.co/reverse?lat=${position.coords.latitude}&lon=${position.coords.longitude}`
+	axios
+		.get(url)
+		.then(res => {
+			positionDisplay(res)
+		})
+		.catch(_err => locationError())
+}
+const positionDisplay = res => {
+	post.value.location = res.data.address.city
+	if (res.data.address.country)
+		post.value.location += `, ${res.data.address.country}`
+	isLoading.value = false
+}
+
+const locationError = () => {
+	const locationErrorMessage = 'Your location not found'
+	if ($q.platform.is.mac) {
+		locationErrorMessage +=
+			' You might be able to fix this in System Preferences > Security & Privacy > Location Services'
+	}
+	$q.dialog({
+		title: 'Error',
+		message: locationErrorMessage
+	})
+	isLoading.value = false
+}
+
+const addPost = () => {
+	$q.loading.show()
+
+	const postCreated = localStorage.getItem('postCreated')
+
+	if ($q.platform.is.android && !postCreated && !navigator.onLine) {
+		addPostError()
+		$q.loading.hide()
+	} else {
+		const postData = new FormData()
+		postData.append('id', post.value.id)
+		postData.append('caption', post.value.caption)
+		postData.append('location', post.value.location)
+		postData.append('date', post.value.date)
+		postData.append('file', post.value.photo, post.value.id + '.png')
+		postData.append('userId', post.value.userId)
+		axios
+			.post(`${process.env.API}/createPost`, postData)
+			.then(_res => {
+				localStorage.setItem('postCreated', true)
+				router.push('/')
+				$q.notify({
+					message: 'Post created!',
+					actions: [
+						{
+							label: 'Dismiss',
+							color: 'white'
+						}
+					]
 				})
-				.then(stream => {
-					this.$refs.video.srcObject = stream
-					this.isCamera = false
-				})
-				.catch(_err => (this.hasCamera = false))
-		},
-		getImage() {
-			let video = this.$refs.video
-			let canvas = this.$refs.canvas
-			canvas.width = video.getBoundingClientRect().width
-			canvas.height = video.getBoundingClientRect().height
-			canvas
-				.getContext('2d')
-				.drawImage(video, 0, 0, canvas.width, canvas.height)
-			this.imgCaptured = true
-			this.post.photo = this.dataURItoBlob(canvas.toDataURL())
-			this.disableCamera()
-			this.isCamera = true
-		},
-
-		getImageFile(file) {
-			this.post.photo = file
-			let canvas = this.$refs.canvas
-
-			var reader = new FileReader()
-			reader.onload = event => {
-				var img = new Image()
-				img.onload = () => {
-					canvas.width = img.width
-					canvas.height = img.height
-					canvas.getContext('2d').drawImage(img, 0, 0)
-					this.imgCaptured = true
+				$q.loading.hide()
+				if ($q.platform.is.safari) {
+					setTimeout(() => {
+						window.location.href = '/'
+					}, 1000)
 				}
-				img.src = event.target.result
-			}
-			reader.readAsDataURL(file)
-		},
-
-		disableCamera() {
-			this.$refs.video.srcObject.getVideoTracks().forEach(track => track.stop())
-		},
-
-		dataURItoBlob(dataURI) {
-			var byteString = atob(dataURI.split(',')[1])
-			var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
-			var ab = new ArrayBuffer(byteString.length)
-			var ia = new Uint8Array(ab)
-			for (var i = 0; i < byteString.length; i++) {
-				ia[i] = byteString.charCodeAt(i)
-			}
-			var blob = new Blob([ab], { type: mimeString })
-			return blob
-		},
-
-		getLocation() {
-			this.isLoading = true
-			navigator.geolocation.getCurrentPosition(
-				position => {
-					this.getMyPosition(position)
-				},
-				_err => {
-					this.locationError()
-				},
-				{ timeout: 7000 }
-			)
-		},
-
-		getMyPosition(position) {
-			const url = `https://geocode.maps.co/reverse?lat=${position.coords.latitude}&lon=${position.coords.longitude}`
-			this.$axios
-				.get(url)
-				.then(res => {
-					this.positionDisplay(res)
-				})
-				.catch(_err => this.locationError())
-		},
-		positionDisplay(res) {
-			this.post.location = res.data.address.city
-			if (res.data.address.country)
-				this.post.location += `, ${res.data.address.country}`
-			this.isLoading = false
-		},
-		locationError() {
-			const locationErrorMessage = 'Your location not found'
-			if (this.$q.platform.is.mac) {
-				locationErrorMessage +=
-					' You might be able to fix this in System Preferences > Security & Privacy > Location Services'
-			}
-			this.$q.dialog({
-				title: 'Error',
-				message: locationErrorMessage
 			})
-			this.isLoading = false
-		},
-		addPost() {
-			this.$q.loading.show()
-
-			const postCreated = this.$q.localStorage.getItem('postCreated')
-
-			if (this.$q.platform.is.android && !postCreated && !navigator.onLine) {
-				this.addPostError()
-				this.$q.loading.hide()
-			} else {
-				const postData = new FormData()
-				postData.append('id', this.post.id)
-				postData.append('caption', this.post.caption)
-				postData.append('location', this.post.location)
-				postData.append('date', this.post.date)
-				postData.append('file', this.post.photo, this.post.id + '.png')
-				postData.append('userId', this.post.userId)
-				this.$axios
-					.post(`${process.env.API}/createPost`, postData)
-					.then(_res => {
-						this.$q.localStorage.set('postCreated', true)
-						this.$router.push('/')
-						this.$q.notify({
-							message: 'Post created!',
-							actions: [
-								{
-									label: 'Dismiss',
-									color: 'white'
-								}
-							]
-						})
-						this.$q.loading.hide()
-						if (this.$q.platform.is.safari) {
-							setTimeout(() => {
-								window.location.href = '/'
-							}, 1000)
-						}
-					})
-					.catch(err => {
-						console.log(err)
-						if (!navigator.onLine && this.isSyncSupported && postCreated) {
-							this.$q.notify('Post created offline')
-							this.$router.push('/')
-						} else {
-							this.addPostError()
-						}
-						this.$q.loading.hide()
-					})
-			}
-		},
-		addPostError() {
-			this.$q.dialog({
-				title: 'Error',
-				message: 'Sory, could not create post'
+			.catch(err => {
+				console.log(err)
+				if (!navigator.onLine && isSyncSupported && postCreated) {
+					$q.notify('Post created offline')
+					router.push('/')
+				} else {
+					addPostError()
+				}
+				$q.loading.hide()
 			})
-		}
-	},
-	mounted() {
-		this.getCamera()
-	},
-	beforeUnmount() {
-		if (this.hasCamera) {
-			this.disableCamera()
-		}
 	}
 }
+
+const addPostError = () => {
+	$q.dialog({
+		title: 'Error',
+		message: 'Sory, could not create post'
+	})
+}
+
+onMounted(() => {
+	getCamera()
+})
+
+onBeforeUnmount(() => {
+	if (hasCamera.value) {
+		disableCamera()
+	}
+})
 </script>
 <style lang="sass">
 .camera

@@ -1,10 +1,14 @@
 const routes = [
 	{
 		path: '/auth',
-		name: 'Login',
+		name: 'Auth',
 		component: () => import('pages/AuthPage.vue'),
 		children: [
-			{ path: '', component: () => import('pages/auth/LoginSection.vue') },
+			{
+				path: '',
+				name: 'Login',
+				component: () => import('pages/auth/LoginSection.vue')
+			},
 			{
 				path: 'register',
 				name: 'Register',
@@ -14,13 +18,22 @@ const routes = [
 	},
 	{
 		path: '/',
-
 		component: () => import('layouts/MainLayout.vue'),
 		children: [
-			{ path: '/', component: () => import('pages/PageHome.vue') },
-			{ path: '/camera', component: () => import('pages/PageCamera.vue') },
+			{
+				path: '/',
+				name: 'PageHome',
+				component: () => import('pages/PageHome.vue')
+			},
+
+			{
+				path: '/camera',
+				name: 'PageCamera',
+				component: () => import('pages/PageCamera.vue')
+			},
 			{
 				path: '/account',
+				name: 'AccountPage',
 				component: () => import('pages/AccountPage.vue')
 			}
 		]
