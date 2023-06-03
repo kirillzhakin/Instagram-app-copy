@@ -201,6 +201,13 @@ const isNotificationsSupported = computed(() =>
 	'PushManager' in window ? true : false
 )
 
+const addPostError = () => {
+	$q.dialog({
+		title: 'Error',
+		message: 'Sory, could not delete post'
+	})
+}
+
 const deletePost = id => {
 	$q.loading.show()
 
@@ -242,13 +249,6 @@ const deletePost = id => {
 	}
 }
 
-const addPostError = () => {
-	$q.dialog({
-		title: 'Error',
-		message: 'Sory, could not delete post'
-	})
-}
-
 const getPosts = () => {
 	isLoading.value = true
 
@@ -275,6 +275,7 @@ const getPosts = () => {
 			isLoading.value = false
 		})
 }
+
 const getOfflinePosts = () => {
 	const db = openDB('workbox-background-sync').then(db => {
 		db.getAll('requests')

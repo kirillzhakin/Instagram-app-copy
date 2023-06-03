@@ -109,8 +109,9 @@ const hasCamera = ref(true)
 
 const isSupported = computed(() => ('geolocation' in navigator ? true : false))
 
-const isSyncSupported = () =>
+const isSyncSupported = computed(() =>
 	'serviceWorker' in navigator && 'SyncManager' in window ? true : false
+)
 
 const getCamera = () => {
 	navigator.mediaDevices
@@ -213,6 +214,13 @@ const locationError = () => {
 	isLoading.value = false
 }
 
+const addPostError = () => {
+	$q.dialog({
+		title: 'Error',
+		message: 'Sory, could not create post'
+	})
+}
+
 const addPost = () => {
 	$q.loading.show()
 
@@ -261,13 +269,6 @@ const addPost = () => {
 				$q.loading.hide()
 			})
 	}
-}
-
-const addPostError = () => {
-	$q.dialog({
-		title: 'Error',
-		message: 'Sory, could not create post'
-	})
 }
 
 onMounted(() => {
