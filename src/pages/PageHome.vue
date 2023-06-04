@@ -261,13 +261,15 @@ const getPosts = () => {
 			params: { userId: userId.value }
 		})
 		.then(({ data }) => {
+			console.log(data)
 			posts.value = [...data]
 			isLoading.value = false
 			if (!navigator.onLine) {
 				getOfflinePosts()
 			}
 		})
-		.catch(_err => {
+		.catch(err => {
+			console.log(err)
 			$q.dialog({
 				title: 'Error',
 				message: 'Posts not found'
