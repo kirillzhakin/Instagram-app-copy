@@ -1,19 +1,48 @@
-
 const routes = [
-  {
-    path: '/',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [
-      { path: '', component: () => import('pages/IndexPage.vue') }
-    ]
-  },
+	{
+		path: '/auth',
+		name: 'Auth',
+		component: () => import('pages/AuthPage.vue'),
+		children: [
+			{
+				path: '',
+				name: 'Login',
+				component: () => import('pages/auth/LoginSection.vue')
+			},
+			{
+				path: 'register',
+				name: 'Register',
+				component: () => import('pages/auth/RegisterSection.vue')
+			}
+		]
+	},
+	{
+		path: '/',
+		component: () => import('layouts/MainLayout.vue'),
+		children: [
+			{
+				path: '/',
+				name: 'PageHome',
+				component: () => import('pages/PageHome.vue')
+			},
 
-  // Always leave this as last one,
-  // but you can also remove it
-  {
-    path: '/:catchAll(.*)*',
-    component: () => import('pages/ErrorNotFound.vue')
-  }
+			{
+				path: '/camera',
+				name: 'PageCamera',
+				component: () => import('pages/PageCamera.vue')
+			},
+			{
+				path: '/account',
+				name: 'AccountPage',
+				component: () => import('pages/AccountPage.vue')
+			}
+		]
+	},
+
+	{
+		path: '/:catchAll(.*)*',
+		component: () => import('pages/ErrorNotFound.vue')
+	}
 ]
 
 export default routes

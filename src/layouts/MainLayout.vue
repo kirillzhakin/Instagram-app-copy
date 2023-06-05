@@ -1,116 +1,161 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
-      <q-toolbar>
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="toggleLeftDrawer"
-        />
+	<q-layout view="lHh Lpr lFf">
+		<q-header class="bg-white text-grey-10" bordered>
+			<q-toolbar class="desktop-screen">
+				<q-btn
+					to="/camera"
+					class="large-screen-only q-mr-sm"
+					flat
+					round
+					dense
+					size="18px"
+					icon="eva-camera-outline"
+				/>
+				<q-separator class="large-screen-only" spaced vertical />
+				<q-toolbar-title class="text-grand-hotel text-bold">
+					Instagram
+				</q-toolbar-title>
+				<q-btn
+					to="/"
+					class="large-screen-only"
+					flat
+					round
+					dense
+					size="18px"
+					icon="eva-home-outline"
+				/>
+			</q-toolbar>
+		</q-header>
 
-        <q-toolbar-title>
-          Quasar App
-        </q-toolbar-title>
+		<q-footer class="bg-white" bordered>
+			<transition
+				appear
+				enter-active-class="animated fadeIn"
+				leave-active-class="animated fadeOut"
+			>
+				<div v-if="showInstallApp" class="banner-container bg-primary">
+					<div class="desktop-screen">
+						<q-banner inline-actions dense class="bg-primary text-white">
+							<template v-slot:avatar>
+								<q-avatar
+									color="white"
+									icon="eva-camera-outline"
+									text-color="grey-10"
+									font-size="22px"
+								/>
+							</template>
+							Install App?
+							<template v-slot:action>
+								<q-btn
+									@click="installApp"
+									flat
+									label="Yes"
+									dense
+									class="q-px-sm"
+								/>
+								<q-btn
+									@click="showInstallApp = false"
+									flat
+									label="Later"
+									dense
+									class="q-px-sm"
+								/>
+								<q-btn
+									@click="neverShowAppInstall"
+									flat
+									label="Never"
+									dense
+									class="q-px-sm"
+								/>
+							</template>
+						</q-banner>
+					</div>
+				</div>
+			</transition>
 
-        <div>Quasar v{{ $q.version }}</div>
-      </q-toolbar>
-    </q-header>
-
-    <q-drawer
-      v-model="leftDrawerOpen"
-      show-if-above
-      bordered
-    >
-      <q-list>
-        <q-item-label
-          header
-        >
-          Essential Links
-        </q-item-label>
-
-        <EssentialLink
-          v-for="link in essentialLinks"
-          :key="link.title"
-          v-bind="link"
-        />
-      </q-list>
-    </q-drawer>
-
-    <q-page-container>
-      <router-view />
-    </q-page-container>
-  </q-layout>
+			<q-tabs
+				class="text-grey-10 small-screen-only"
+				active-color="primary"
+				indicator-color="transparent"
+			>
+				<q-route-tab to="/" icon="eva-home-outline" />
+				<q-route-tab to="/camera" icon="eva-camera-outline" />
+			</q-tabs>
+		</q-footer>
+		<q-page-container class="bg-grey-1">
+			<router-view v-slot="{ Component }">
+				<transition appear name="component-fade" mode="out-in">
+					<keep-alive :include="['PageHome']">
+						<component :is="Component" />
+					</keep-alive>
+				</transition>
+			</router-view>
+		</q-page-container>
+	</q-layout>
 </template>
 
 <script>
-import { defineComponent, ref } from 'vue'
-import EssentialLink from 'components/EssentialLink.vue'
+let deferredPrompt
+export default {
+	name: 'MainLayout',
 
-const linksList = [
-  {
-    title: 'Docs',
-    caption: 'quasar.dev',
-    icon: 'school',
-    link: 'https://quasar.dev'
-  },
-  {
-    title: 'Github',
-    caption: 'github.com/quasarframework',
-    icon: 'code',
-    link: 'https://github.com/quasarframework'
-  },
-  {
-    title: 'Discord Chat Channel',
-    caption: 'chat.quasar.dev',
-    icon: 'chat',
-    link: 'https://chat.quasar.dev'
-  },
-  {
-    title: 'Forum',
-    caption: 'forum.quasar.dev',
-    icon: 'record_voice_over',
-    link: 'https://forum.quasar.dev'
-  },
-  {
-    title: 'Twitter',
-    caption: '@quasarframework',
-    icon: 'rss_feed',
-    link: 'https://twitter.quasar.dev'
-  },
-  {
-    title: 'Facebook',
-    caption: '@QuasarFramework',
-    icon: 'public',
-    link: 'https://facebook.quasar.dev'
-  },
-  {
-    title: 'Quasar Awesome',
-    caption: 'Community Quasar projects',
-    icon: 'favorite',
-    link: 'https://awesome.quasar.dev'
-  }
-]
+	data() {
+		return {
+			showInstallApp: false
+		}
+	},
 
-export default defineComponent({
-  name: 'MainLayout',
+	methods: {
+		installApp() {
+			this.showInstallApp = false
+			deferredPrompt.prompt()
+			deferredPrompt.userChoice.then(result => {
+				if (result.outcome === 'accepted') {
+					console.log('User accepted the install prompt')
+				} else {
+					console.log('User dismissed the install prompt')
+				}
+			})
+		},
 
-  components: {
-    EssentialLink
-  },
+		neverShowAppInstall() {
+			this.showInstallApp = false
+			this.$q.localStorage.set('neverShowAppInstall', true)
+		}
+	},
+	mounted() {
+		const dontShowAppInstall = this.$q.localStorage.getItem(
+			'neverShowAppInstall'
+		)
 
-  setup () {
-    const leftDrawerOpen = ref(false)
+		if (!dontShowAppInstall) {
+			window.addEventListener('beforeinstallprompt', e => {
+				e.preventDefault()
+				deferredPrompt = e
 
-    return {
-      essentialLinks: linksList,
-      leftDrawerOpen,
-      toggleLeftDrawer () {
-        leftDrawerOpen.value = !leftDrawerOpen.value
-      }
-    }
-  }
-})
+				setTimeout(() => {
+					this.showInstallApp = true
+				}, 3000)
+			})
+		}
+	}
+}
 </script>
+
+<style lang="sass">
+
+.q-toolbar
+  @media (min-width: $breakpoint-sm-min)
+    height: 77px
+.q-toolbar__title
+  @media (max-width: $breakpoint-xs-max)
+   text-align: center
+   font-size: 30px
+.q-footer
+  .q-tab__icon
+   font-size: 30px
+.platform-ios
+  .q-footer
+    padding-bottom: constant(safe-area-inset-bottom)
+    padding-bottom: env(safe-area-inset-bottom)
+</style>
