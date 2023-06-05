@@ -1,58 +1,60 @@
-# chromium
+# Instagram Copy App
 
-to-do-list/commits
+[Instagram Copy App](https://instagram-copy-app.ru) — это копия популярной социальной сети Instagram. Реализован личный кабинет пользователя.
 
-1. add branch develop
-2. create project
-3. add page home and camera
-4. add footer and nav
-5. add footer and header style
-6. add media-breakpoints
-7. add nav header
-8. add info-home-page
-9. add posts
-10. add profile
-11. add camera and form for posts
-12. get video and get image capture
-13. get data location
-14. create backend express
-15. relocation folder backend
-16. connect backend and firebase
-17. loading posts
-18. add process.env
-19. add post
-20. add spinner display
-21. create pwa and init manifest
-22. get icons from pwa
-23. add banner install app
-24. debug pwa
-25. config firebase hosting
-26. add workbox strategies
-27. backgroud sync
-28. offline posts
-29. add push notifications
-30. add push notifications last version
-31. fixed keep-alive
-32. fixed location
-33. add utils constants
-34. fixing desktop issues
-35. fixing geocodung
-36. fixing create posts android
-37. fixing image button ios
+### Функционал
 
-38. add register form
-39. fixing register form
-40. add auth form
-41. add account menu
-42. add register firebase
-43. add env file
-44. add login firebase
-45. add update firebase
-46. fixing update firebase
-47. fix form update
-48. add routing
-49. fixing routing problem
-50. add delete post
-51. add hahdle avatar
-52. add upload avatar
-    Hosting URL: https://chromium-d89a6.web.app
+- регистрация и авторизация пользователя,
+- валидация форм,
+- редактирование профиля (аватар, имя пользователя, электронная почта),
+- push-уведомления (создание постов)
+- создание постов
+- создание постов offline
+- удаление постов
+- вкл/выкл камеры
+- загрузка изображения с устройства
+- получение геоданных
+
+### Технологии
+
+![JavaScript](https://img.shields.io/badge/JavaScript-172F45?style=for-the-badge&logo=JavaScript)
+![VUE](https://img.shields.io/badge/VUE3-172F45?style=for-the-badge&logo=vuedotjs)
+![QUASAR](https://img.shields.io/badge/QUASAR-172F45?style=for-the-badge&logo=quasar)
+![Firebase](https://img.shields.io/badge/Firestore-172F45?style=for-the-badge&logo=firebase)
+![PWA](https://img.shields.io/badge/PWA-172F45?style=for-the-badge&logo=pwa)
+
+API проекта - https://github.com/kirillzhakin/instagram-app-copy-backend.git
+
+### Инструкция
+
+Чтобы запустить проект, нужно сделать несколько простых шагов.
+
+- Создайте папку и перейдите в неё:
+
+```
+cd <Имя-папки>
+```
+
+- Склонируйте этот репозиторий:
+
+```
+git clone https://github.com/kirillzhakin/Instagram-app-copy.git
+```
+
+- Установите все зависимости:
+
+```
+yarn или npm install
+```
+
+- Теперь можете запустить проект:
+
+```
+quasar dev или quasar dev -m pwa
+```
+
+## Ссылки
+
+Репозиторий: https://github.com/kirillzhakin/Instagram-app-copy
+
+Сайт: https://instagram-copy-app.ru
