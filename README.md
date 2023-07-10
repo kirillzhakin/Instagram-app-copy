@@ -1,11 +1,28 @@
 # Instagram Copy App
 
-[Instagram Copy App](https://instagram-copy-app.ru) — это копия популярной социальной сети Instagram. Реализован личный кабинет пользователя.
+[Instagram Copy App](https://instagram-app-copy.vercel.app) — это копия популярной социальной сети Instagram. Реализован личный кабинет пользователя.
+
+### Страница входа
+
+  <image src="./images/insta_1.jpg" alt="signup/signin">
+
+### Домашняя страница
+
+  <image src="./images/insta_2.jpg" alt="home page">
+
+### Страница загрузки фото с диска или сделать селфи
+
+  <image src="./images/insta_3.jpg" alt="get foto">
+
+### Редактирование профиля
+
+  <image src="./images/insta_4.jpg" alt="update profile">
 
 ### Функционал
 
 - регистрация и авторизация пользователя Firebase
 - валидация форм
+
 - редактирование профиля (аватар, имя пользователя, электронная почта) Firebase
 - push-уведомления (создание постов)
 - создание постов
@@ -58,4 +75,4 @@ quasar dev или quasar dev -m pwa
 
 Репозиторий: https://github.com/kirillzhakin/Instagram-app-copy
 
-Сайт: https://instagram-copy-app.ru
+Сайт: https://instagram-app-copy.vercel.app
