@@ -10,10 +10,8 @@
 
 const { configure } = require('quasar/wrappers')
 
-const API_LOCAL = 'http://localhost:3000'
-const API_PROD = 'https://instagram-app-copy-backend.vercel.app'
-
 module.exports = configure(function (/* ctx */) {
+	require('dotenv').config()
 	return {
 		eslint: {
 			// fix: true,
@@ -52,13 +50,13 @@ module.exports = configure(function (/* ctx */) {
 		// Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#build
 		build: {
 			env: {
-				API: API_PROD, /// API_LOCAL or API _PROD
-				FIREBASE_API_KEY: 'AIzaSyCsPsiQzZ4MUv_ulFMm9YWdhodrxxucS_M',
-				FIREBASE_AUTH_DOMAIN: 'chromium-d89a6.firebaseapp.com',
-				FIREBASE_PROJECT_ID: 'chromium-d89a6',
-				FIREBASE_STORAGE_BUCKET: 'chromium-d89a6.appspot.com',
-				FIREBASE_MESSAGING_SENDER_ID: '1071094919653',
-				FIREBASE_APP_ID: '1:1071094919653:web:c05cd2b613251c6880bf0c'
+				API: process.env.API_PROD, /// API_LOCAL or API _PROD
+				FIREBASE_API_KEY: process.env.FIREBASE_API_KEY,
+				FIREBASE_AUTH_DOMAIN: process.env.FIREBASE_AUTH_DOMAIN,
+				FIREBASE_PROJECT_ID: process.env.FIREBASE_PROJECT_ID,
+				FIREBASE_STORAGE_BUCKET: process.env.FIREBASE_STORAGE_BUCKET,
+				FIREBASE_MESSAGING_SENDER_ID: process.env.FIREBASE_MESSAGING_SENDER_ID,
+				FIREBASE_APP_ID: process.env.FIREBASE_APP_ID
 			},
 
 			target: {
